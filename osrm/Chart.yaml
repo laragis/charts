@@ -1,0 +1,32 @@
+# Copyright Broadcom, Inc. All Rights Reserved.
+# SPDX-License-Identifier: APACHE-2.0
+
+annotations:
+  category: Map
+  licenses: MIT
+  images: |
+    - name: osrm-backend
+      image: ghcr.io/project-osrm/osrm-backend:v5.27.1
+    - name: httpie
+      image: docker.io/alpine/httpie:3.2.3
+apiVersion: v2
+appVersion: 5.27.1
+dependencies:
+- name: common
+  repository: oci://registry-1.docker.io/bitnamicharts
+  tags:
+  - bitnami-common
+  version: 2.x.x
+description: OSRM - Open Source Routing Machine.
+home: https://laragis.vn
+icon: https://laragis.vn/assets/stacks/osrm/img/osrm-stack-220x234.png
+keywords:
+  - osrm
+maintainers:
+  - name: Truong Thanh Tung.
+    url: https://github.com/laragis/charts
+name: osrm
+sources:
+  - https://github.com/laragis/charts/tree/main/laragis/osrm
+  - https://github.com/laragis/containers/tree/main/laragis/osrm
+version: 0.1.0

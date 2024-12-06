@@ -1,0 +1,54 @@
+{{- range $name, $obj := .Values.profiles }}
+{{- if $obj.enabled }}
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if $obj.autoscaling.hpa.enabled }}
+apiVersion: {{ include "common.capabilities.hpa.apiVersion" ( dict "context" $ ) }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "common.names.fullname" . }}-{{ $name }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" $.Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ $name }}
+  {{- if $.Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $.Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  scaleTargetRef:
+    apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+    kind: Deployment
+    name: {{ include "common.names.fullname" . }}
+  minReplicas: {{ $obj.autoscaling.hpa.minReplicas }}
+  maxReplicas: {{ $obj.autoscaling.hpa.maxReplicas }}
+  metrics:
+    {{- if $obj.autoscaling.hpa.targetMemory }}
+    - type: Resource
+      resource:
+        name: memory
+        {{- if semverCompare "<1.23-0" (include "common.capabilities.kubeVersion" .) }}
+        targetAverageUtilization: {{ $obj.autoscaling.hpa.targetMemory }}
+        {{- else }}
+        target:
+          type: Utilization
+          averageUtilization: {{ $obj.autoscaling.hpa.targetMemory }}
+        {{- end }}
+    {{- end }}
+    {{- if $obj.autoscaling.hpa.targetCPU }}
+    - type: Resource
+      resource:
+        name: cpu
+        {{- if semverCompare "<1.23-0" (include "common.capabilities.kubeVersion" .) }}
+        targetAverageUtilization: {{ $obj.autoscaling.hpa.targetCPU }}
+        {{- else }}
+        target:
+          type: Utilization
+          averageUtilization: {{ $obj.autoscaling.hpa.targetCPU }}
+        {{- end }}
+    {{- end }}
+{{- end }}
+---
+{{- end }}
+{{- end }}

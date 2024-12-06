@@ -1,0 +1,145 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "common.names.fullname" . }}-extract
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: extraction
+  {{- if or .Values.extraction.annotations .Values.commonAnnotations }}
+  {{- $defaultAnnotations := dict "helm.sh/hook" "post-install,post-upgrade" "helm.sh/hook-delete-policy" "before-hook-creation,hook-succeeded" }}
+  {{- $annotations := include "common.tplvalues.merge" ( dict "values" ( list .Values.extraction.annotations .Values.commonAnnotations $defaultAnnotations ) "context" . ) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $) | nindent 4 }}
+  {{- end }}
+spec:
+  ttlSecondsAfterFinished: 30
+  template:
+    metadata:
+      {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.extraction.podLabels .Values.commonLabels ) "context" . ) }}
+      labels: {{- include "common.labels.standard" ( dict "customLabels" $podLabels "context" $ ) | nindent 8 }}
+        app.kubernetes.io/component: extraction
+      {{- if .Values.extraction.podAnnotations }}
+      annotations: {{- include "common.tplvalues.render" (dict "value" .Values.extraction.podAnnotations "context" $) | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- include "osrm.imagePullSecrets" . | nindent 6 }}
+      restartPolicy: OnFailure
+      {{- if .Values.extraction.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.extraction.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
+      initContainers:
+        - name: http-download
+          image: alpine/httpie:3.2.3
+          command:
+            - /bin/sh
+          args:
+            - -ec
+            - |
+              version="{{ include "osrm.data.version" . }}"
+              uri="{{ .Values.data.uri }}"
+
+              mkdir -p "/data/${version}"
+              cd "/data/${version}"
+
+              if [ ! -f "/data/${version}/map.osm.pbf" ]; then
+                http --download "${uri}" --output map.osm.pbf
+              fi
+
+              echo "Done!"
+          volumeMounts:
+            {{- if and .Values.persistence.enabled .Values.persistence.mountPath }}
+            - name: data
+              mountPath: {{ .Values.persistence.mountPath }}
+              subPath: {{ .Values.persistence.subPath }}
+            {{- end }}
+          {{- if .Values.extraction.containerSecurityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.extraction.containerSecurityContext "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.extraction.initContainer.resources }}
+          resources: {{- toYaml .Values.extraction.initContainer.resources | nindent 12 }}
+          {{- else if ne .Values.extraction.initContainer.resourcesPreset "none" }}
+          resources: {{- include "common.resources.preset" (dict "type" .Values.extraction.initContainer.resourcesPreset) | nindent 12 }}
+          {{- end }}
+      containers:
+        {{- range $name, $obj := .Values.profiles }}
+        {{- if $obj.enabled }}
+        - name: http-extract-{{ $name }}
+          image: {{ include "osrm.image" $ }}
+          command:
+            - /bin/bash
+          args:
+            - -ec
+            - |
+              #!/bin/bash
+
+              set -o errexit
+              set -o nounset
+              set -o pipefail
+
+              version="{{ include "osrm.data.version" $}}"
+              profile="{{ $name }}"
+
+              cd "/data/${version}"
+              mkdir -p "${profile}"
+              
+              if [ ! -r "${profile}/extracted.lock" ]; then
+                rm -rf "${profile}/*"
+                cp map.osm.pbf "${profile}/"
+
+                osrm-extract -p "/opt/${profile}.lua" "${profile}/map.osm.pbf"
+                osrm-partition "${profile}/map.osrm"
+                osrm-customize "${profile}/map.osrm"
+
+                rm -rf "${profile}/map.osm.pbf"
+                touch extracted.lock
+              fi
+
+              echo "Done!"          
+          {{- if $.Values.extraction.containerSecurityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.extraction.containerSecurityContext "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if or $.Values.extraction.extraEnvVarsCM $.Values.extraction.extraEnvVarsSecret }}
+          envFrom:
+            {{- if $.Values.extraction.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ $.Values.extraction.extraEnvVarsCM }}
+            {{- end }}
+            {{- if $.Values.extraction.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ $.Values.extraction.extraEnvVarsSecret }}
+            {{- end }}
+          {{- end }}
+          {{- if $.Values.extraction.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" $.Values.extraction.extraEnvVars "context" $) | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            {{- if and $.Values.persistence.enabled $.Values.persistence.mountPath }}
+            - name: data
+              mountPath: {{ $.Values.persistence.mountPath }}
+              subPath: {{ $.Values.persistence.subPath }}
+            {{- end }}
+            {{- if $.Values.extraction.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" $.Values.extraction.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
+          {{- if $.Values.extraction.resources }}
+          resources: {{- toYaml $.Values.extraction.resources | nindent 12 }}
+          {{- else if ne $.Values.extraction.resourcesPreset "none" }}
+          resources: {{- include "common.resources.preset" (dict "type" $.Values.extraction.resourcesPreset) | nindent 12 }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
+      volumes:
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "common.names.fullname" .) }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+      {{- if .Values.extraction.extraVolumes }}
+      {{- include "common.tplvalues.render" (dict "value" .Values.extraction.extraVolumes "context" $) | nindent 6 }}
+      {{- end }}
