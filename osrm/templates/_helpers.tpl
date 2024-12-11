@@ -38,23 +38,8 @@ Return the version of Data
 {{- end -}}
 
 {{/*
-Return an array of enabled profiles with their settings
+Return the persistence mountPath
 */}}
-{{- define "osrm.profiles" -}}
-{{- list .Values.osrmCar .Values.osrmBicycle .Values.osrmFoot | toYaml }}
-{{- end -}}
-
-
-{{- define "osrm.profiles1" -}}
-{{- $profiles := list -}}
-{{- if .Values.osrmCar.enabled -}}
-{{- $profiles = append $profiles (merge (dict "type" "car") .Values.osrmCar) -}}
-{{- end -}}
-{{- if .Values.osrmBicycle.enabled -}}
-{{- $profiles = append $profiles (merge (dict "type" "bicycle") .Values.osrmBicycle) -}}
-{{- end -}}
-{{- if .Values.osrmFoot.enabled -}}
-{{- $profiles = append $profiles (merge (dict "type" "foot") .Values.osrmFoot) -}}
-{{- end -}}
-{{- toYaml $profiles -}}
+{{- define "osrm.persistence.mountPath" -}}
+{{- default "/data" .Values.persistence.mountPath -}}
 {{- end -}}

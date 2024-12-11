@@ -5,11 +5,6 @@ Copyright Broadcom, Inc. All Rights Reserved.
 SPDX-License-Identifier: APACHE-2.0
 */}}
 
-{{- /*
-Copyright Broadcom, Inc. All Rights Reserved.
-SPDX-License-Identifier: APACHE-2.0
-*/}}
-
 apiVersion: {{ include "common.capabilities.deployment.apiVersion" $ }}
 kind: Deployment
 metadata:
@@ -21,62 +16,60 @@ metadata:
   annotations: {{- include "common.tplvalues.render" ( dict "value" $.Values.commonAnnotations "context" $ ) | nindent 4 }}
   {{- end }}
 spec:
-  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list $.Values.podLabels $.Values.commonLabels ) "context" . ) }}
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list $obj.podLabels $.Values.commonLabels ) "context" . ) }}
   selector:
     matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
-  {{- if $.Values.updateStrategy }}
-  strategy: {{- toYaml $.Values.updateStrategy | nindent 4 }}
+  {{- if $obj.updateStrategy }}
+  strategy: {{- toYaml $obj.updateStrategy | nindent 4 }}
   {{- end }}
-  {{- if not $.Values.autoscaling.hpa.enabled }}
-  replicas: {{ $.Values.replicaCount }}
+  {{- if not $obj.autoscaling.hpa.enabled }}
+  replicas: {{ $obj.replicaCount }}
   {{- end }}
   template:
     metadata:
       labels: {{- include "common.labels.standard" ( dict "customLabels" $podLabels "context" $ ) | nindent 8 }}
         app.kubernetes.io/component: {{ $name }}
-      {{- if $.Values.podAnnotations }}
       annotations:
-        {{- if $.Values.podAnnotations }}
-        {{- include "common.tplvalues.render" (dict "value" $.Values.podAnnotations "context" $) | nindent 8 }}
+        {{- if $obj.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" $obj.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
-      {{- end }}
     spec:
       {{- include "osrm.imagePullSecrets" $ | nindent 6 }}
-      automountServiceAccountToken: {{ $.Values.automountServiceAccountToken }}
-      {{- if $.Values.hostAliases }}
+      automountServiceAccountToken: {{ $obj.automountServiceAccountToken }}
+      {{- if $obj.hostAliases }}
       # yamllint disable rule:indentation
-      hostAliases: {{- include "common.tplvalues.render" (dict "value" $.Values.hostAliases "context" $) | nindent 8 }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" $obj.hostAliases "context" $) | nindent 8 }}
       # yamllint enable rule:indentation
       {{- end }}
-      {{- if $.Values.affinity }}
-      affinity: {{- include "common.tplvalues.render" (dict "value" $.Values.affinity "context" $) | nindent 8 }}
+      {{- if $obj.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" $obj.affinity "context" $) | nindent 8 }}
       {{- else }}
       affinity:
-        podAffinity: {{- include "common.affinities.pods" (dict "type" $.Values.podAffinityPreset "component" $name "customLabels" $podLabels "context" $) | nindent 10 }}
-        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" $.Values.podAntiAffinityPreset "component" $name "customLabels" $podLabels "context" $) | nindent 10 }}
-        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" $.Values.nodeAffinityPreset.type "key" $.Values.nodeAffinityPreset.key "values" $.Values.nodeAffinityPreset.values) | nindent 10 }}
+        podAffinity: {{- include "common.affinities.pods" (dict "type" $obj.podAffinityPreset "component" $name "customLabels" $podLabels "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" $obj.podAntiAffinityPreset "component" $name "customLabels" $podLabels "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" $obj.nodeAffinityPreset.type "key" $obj.nodeAffinityPreset.key "values" $obj.nodeAffinityPreset.values) | nindent 10 }}
       {{- end }}
-      {{- if $.Values.nodeSelector }}
-      nodeSelector: {{- include "common.tplvalues.render" (dict "value" $.Values.nodeSelector "context" $) | nindent 8 }}
+      {{- if $obj.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" $obj.nodeSelector "context" $) | nindent 8 }}
       {{- end }}
-      {{- if $.Values.tolerations }}
-      tolerations: {{- include "common.tplvalues.render" (dict "value" $.Values.tolerations "context" $) | nindent 8 }}
+      {{- if $obj.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" $obj.tolerations "context" $) | nindent 8 }}
       {{- end }}
-      {{- if $.Values.priorityClassName }}
-      priorityClassName: {{ $.Values.priorityClassName }}
+      {{- if $obj.priorityClassName }}
+      priorityClassName: {{ $obj.priorityClassName }}
       {{- end }}
-      {{- if $.Values.schedulerName }}
-      schedulerName: {{ $.Values.schedulerName | quote }}
+      {{- if $obj.schedulerName }}
+      schedulerName: {{ $obj.schedulerName | quote }}
       {{- end }}
-      {{- if $.Values.podSecurityContext.enabled }}
-      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" $.Values.podSecurityContext "context" $) | nindent 8 }}
+      {{- if $obj.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" $obj.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "osrm.serviceAccountName" $ }}
-      {{- if $.Values.terminationGracePeriodSeconds }}
-      terminationGracePeriodSeconds: {{ $.Values.terminationGracePeriodSeconds }}
+      {{- if $obj.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ $obj.terminationGracePeriodSeconds }}
       {{- end }}
-      {{- if $.Values.topologySpreadConstraints }}
-      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" $.Values.topologySpreadConstraints "context" .) | nindent 8 }}
+      {{- if $obj.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" $obj.topologySpreadConstraints "context" .) | nindent 8 }}
       {{- end }}
       initContainers:
         - name: wait-for-file
@@ -91,87 +84,90 @@ spec:
               mountPath: {{ $.Values.persistence.mountPath }}
               subPath: {{ $.Values.persistence.subPath }}
             {{- end }}
-        {{- if $.Values.initContainers }}
-        {{- include "common.tplvalues.render" (dict "value" $.Values.initContainers "context" $) | nindent 8 }}
+        {{- if $obj.initContainers }}
+        {{- include "common.tplvalues.render" (dict "value" $obj.initContainers "context" $) | nindent 8 }}
         {{- end }}
       containers:
         - name: osrm-{{ $name }}
           image: {{ include "osrm.image" $ }}
           imagePullPolicy: {{ $.Values.image.pullPolicy | quote }}
-          {{- if $.Values.diagnosticMode.enabled }}
-          command: {{- include "common.tplvalues.render" (dict "value" $.Values.diagnosticMode.command "context" $) | nindent 12 }}
-          {{- else if $.Values.command }}
-          command: {{- include "common.tplvalues.render" ( dict "value" $.Values.command "context" $) | nindent 12 }}
+          {{- if $obj.diagnosticMode.enabled }}
+          command: {{- include "common.tplvalues.render" (dict "value" $obj.diagnosticMode.command "context" $) | nindent 12 }}
+          {{- else if $obj.command }}
+          command: {{- include "common.tplvalues.render" ( dict "value" $obj.command "context" $) | nindent 12 }}         
+          {{- end }}
+          {{- if $obj.diagnosticMode.enabled }}
+          args: {{- include "common.tplvalues.render" (dict "value" $obj.diagnosticMode.args "context" $) | nindent 12 }}
+          {{- else if $obj.args }}
+          args: {{- include "common.tplvalues.render" ( dict "value" $obj.args "context" $) | nindent 12 }}
           {{- else }}
-          command: ["osrm-routed --algorithm mld /data/{{ include "osrm.data.version" $ }}/{{ $name }}/map.osrm"]
-          command:
+          args:
             - osrm-routed
             - --algorithm
-            - mld
+            - {{ $obj.defaultArgs.algorithm | quote }}
             - /data/{{ include "osrm.data.version" $ }}/{{ $name }}/map.osrm
-            {{- if $.Values.extraArgs }}
-            {{- toYaml $.Values.extraArgs | nindent 12 }}
+            {{- if $obj.extraArgs }}
+            {{- toYaml $obj.extraArgs | nindent 12 }}
             {{- end }}
           {{- end }}
-          {{- if $.Values.diagnosticMode.enabled }}
-          args: {{- include "common.tplvalues.render" (dict "value" $.Values.diagnosticMode.args "context" $) | nindent 12 }}
-          {{- else if $.Values.args }}
-          args: {{- include "common.tplvalues.render" ( dict "value" $.Values.args "context" $) | nindent 12 }}
-          {{- end }}
-          {{- if $.Values.containerSecurityContext.enabled }}
-          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" $.Values.containerSecurityContext "context" $) | nindent 12 }}
+          {{- if $obj.containerSecurityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" $obj.containerSecurityContext "context" $) | nindent 12 }}
           {{- end }}
           env:
             - name: BITNAMI_DEBUG
-              value: {{ ternary "true" "false" (or $.Values.image.debug $.Values.diagnosticMode.enabled) | quote }}
-            {{- if $.Values.extraEnvVars }}
-            {{- include "common.tplvalues.render" (dict "value" $.Values.extraEnvVars "context" $) | nindent 12 }}
+              value: {{ ternary "true" "false" (or $.Values.image.debug $obj.diagnosticMode.enabled) | quote }}
+            {{- if $obj.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" $obj.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}
           envFrom:
-            {{- if $.Values.extraEnvVarsCM }}
+            {{- if $obj.extraEnvVarsCM }}
             - configMapRef:
-                name: {{ include "common.tplvalues.render" (dict "value" $.Values.extraEnvVarsCM "context" $) }}
+                name: {{ include "common.tplvalues.render" (dict "value" $obj.extraEnvVarsCM "context" $) }}
             {{- end }}
-            {{- if $.Values.extraEnvVarsSecret }}
+            {{- if $obj.extraEnvVarsSecret }}
             - secretRef:
-                name: {{ include "common.tplvalues.render" (dict "value" $.Values.extraEnvVarsSecret "context" $) }}
+                name: {{ include "common.tplvalues.render" (dict "value" $obj.extraEnvVarsSecret "context" $) }}
             {{- end }}
           ports:
-            {{- if $.Values.containerPorts.http }}
+            {{- if $obj.containerPorts.http }}
             - name: http
-              containerPort: {{ $.Values.containerPorts.http }}
+              containerPort: {{ $obj.containerPorts.http }}
             {{- end }}
-            {{- if $.Values.containerPorts.https }}
+            {{- if $obj.containerPorts.https }}
             - name: https
-              containerPort: {{ $.Values.containerPorts.https }}
+              containerPort: {{ $obj.containerPorts.https }}
             {{- end }}
-            {{- if $.Values.extraContainerPorts }}
-            {{- include "common.tplvalues.render" (dict "value" $.Values.extraContainerPorts "context" $) | nindent 12 }}
+            {{- if $obj.extraContainerPorts }}
+            {{- include "common.tplvalues.render" (dict "value" $obj.extraContainerPorts "context" $) | nindent 12 }}
             {{- end }}
-          {{- if $.Values.lifecycleHooks }}
-          lifecycle: {{- include "common.tplvalues.render" (dict "value" $.Values.lifecycleHooks "context" $) | nindent 12 }}
+          {{- if $obj.lifecycleHooks }}
+          lifecycle: {{- include "common.tplvalues.render" (dict "value" $obj.lifecycleHooks "context" $) | nindent 12 }}
           {{- end }}
-          {{- if not $.Values.diagnosticMode.enabled }}
-          {{- if $.Values.customStartupProbe }}
-          startupProbe: {{- include "common.tplvalues.render" (dict "value" $.Values.customStartupProbe "context" $) | nindent 12 }}
-          {{- else if $.Values.startupProbe.enabled }}
-          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit $.Values.startupProbe "enabled") "context" $) | nindent 12 }}
+          {{- if not $obj.diagnosticMode.enabled }}
+          {{- if $obj.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" $obj.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if $obj.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit $obj.startupProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: http
           {{- end }}
-          {{- if $.Values.customLivenessProbe }}
-          livenessProbe: {{- include "common.tplvalues.render" (dict "value" $.Values.customLivenessProbe "context" $) | nindent 12 }}
-          {{- else if $.Values.livenessProbe.enabled }}
-          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit $.Values.livenessProbe "enabled") "context" $) | nindent 12 }}
+          {{- if $obj.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" $obj.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if $obj.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit $obj.livenessProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: http
           {{- end }}
-          {{- if $.Values.customReadinessProbe }}
-          readinessProbe: {{- include "common.tplvalues.render" (dict "value" $.Values.customReadinessProbe "context" $) | nindent 12 }}
-          {{- else if $.Values.readinessProbe.enabled }}
-          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit $.Values.readinessProbe "enabled") "context" $) | nindent 12 }}
+          {{- if $obj.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" $obj.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if $obj.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit $obj.readinessProbe "enabled") "context" $) | nindent 12 }}            
           {{- end }}
           {{- end }}
-          {{- if $.Values.resources }}
-          resources: {{- toYaml $.Values.resources | nindent 12 }}
-          {{- else if ne $.Values.resourcesPreset "none" }}
-          resources: {{- include "common.resources.preset" (dict "type" $.Values.resourcesPreset) | nindent 12 }}
+          {{- if $obj.resources }}
+          resources: {{- toYaml $obj.resources | nindent 12 }}
+          {{- else if ne $obj.resourcesPreset "none" }}
+          resources: {{- include "common.resources.preset" (dict "type" $obj.resourcesPreset) | nindent 12 }}
           {{- end }}
           volumeMounts:
             {{- if and $.Values.persistence.enabled $.Values.persistence.mountPath }}
@@ -179,11 +175,11 @@ spec:
               mountPath: {{ $.Values.persistence.mountPath }}
               subPath: {{ $.Values.persistence.subPath }}
             {{- end }}
-            {{- if $.Values.extraVolumeMounts }}
-            {{- include "common.tplvalues.render" (dict "value" $.Values.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- if $obj.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" $obj.extraVolumeMounts "context" $) | nindent 12 }}
             {{- end }}
-        {{- if $.Values.sidecars }}
-        {{- include "common.tplvalues.render" (dict "value" $.Values.sidecars "context" $) | nindent 8 }}
+        {{- if $obj.sidecars }}
+        {{- include "common.tplvalues.render" (dict "value" $obj.sidecars "context" $) | nindent 8 }}
         {{- end }}
       volumes:
         - name: data
@@ -193,8 +189,8 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
-        {{- if $.Values.extraVolumes }}
-        {{- include "common.tplvalues.render" (dict "value" $.Values.extraVolumes "context" $) | nindent 8 }}
+        {{- if $obj.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" $obj.extraVolumes "context" $) | nindent 8 }}
         {{- end }}
 ---
 {{- end }}

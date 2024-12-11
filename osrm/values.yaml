@@ -53,20 +53,6 @@ clusterDomain: cluster.local
 ## @param extraDeploy Array of extra objects to deploy with the release
 ##
 extraDeploy: []
-## Enable diagnostic mode in the deployment
-##
-diagnosticMode:
-  ## @param diagnosticMode.enabled Enable diagnostic mode (all probes will be disabled and the command will be overridden)
-  ##
-  enabled: false
-  ## @param diagnosticMode.command Command to override all containers in the deployment
-  ##
-  command:
-    - sleep
-  ## @param diagnosticMode.args Args to override all containers in the deployment
-  ##
-  args:
-    - infinity
 
 ## LaraGIS OSRM image
 ## ref: https://hub.docker.com/r/laragis/osrm/tags/
@@ -126,21 +112,164 @@ data:
   ## - https://download.openstreetmap.fr/extracts/
   ##
   uri: https://download.geofabrik.de/asia/vietnam-latest.osm.pbf
+## @param extraction 
+extraction:
+  ## @param extraction.enabled Enable setting up the Airflow database using a K8s job (otherwise it's done by the Webserver on startup)
+  ##
+  enabled: true
+  ## @param extraction.backoffLimit set backoff limit of the job
+  ##
+  backoffLimit: 3
+  ## @section osrm Configuration parameters
+  ## osrm settings based on environment variables
+  ## ref: https://github.com/laragis/containers/tree/main/laragis/osrm#environment-variables
+  ##
+  ## @param extraction.command Override default container command (useful when using custom images)
+  ##
+  command: []
+  ## @param extraction.args Override default container args (useful when using custom images)
+  ##
+  args: []
+  ## @param extraEnvVars Array with extra environment variables to add to the osrm container
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param extraction.extraEnvVarsCM Name of existing ConfigMap containing extra env vars
+  ##
+  extraEnvVarsCM: ""
+  ## @param extraction.extraEnvVarsSecret Name of existing Secret containing extra env vars
+  ##
+  extraEnvVarsSecret: ""
+  ## @param extraction.extraVolumes Optionally specify extra list of additional volumes for OSRM pods
+  ##
+  extraVolumes: []
+  ## @param extraction.extraVolumeMounts Optionally specify extra list of additional volumeMounts for OSRM container(s)
+  ##
+  extraVolumeMounts: []
+  ## @param extraction.initContainers Add additional init containers to the OSRM pods
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  ## e.g:
+  ## initContainers:
+  ##  - name: your-image-name
+  ##    image: your-image
+  ##    imagePullPolicy: Always
+  ##    command: ['sh', '-c', 'copy themes and plugins from git and push to /bitnami/osrm/wp-content. Should work with extraVolumeMounts and extraVolumes']
+  ##
+  initContainers: []
+  ## @param extraction.podLabels Extra labels for OSRM pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels: {}
+  ## @param extraction.podAnnotations Annotations for OSRM pods
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  podAnnotations: {}
+  ## OSRM containers' resource requests and limits
+  ## ref: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+  ## @param extraction.resourcesPreset Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if resources is set (resources is recommended for production).
+  ## More information: https://github.com/bitnami/charts/blob/main/bitnami/common/templates/_resources.tpl#L15
+  ##
+  resourcesPreset: "none"
+  ## @param extraction.resources Set container requests and limits for different resources like CPU or memory (essential for production workloads)
+  ## Example:
+  ## resources:
+  ##   requests:
+  ##     cpu: 2
+  ##     memory: 512Mi
+  ##   limits:
+  ##     cpu: 3
+  ##     memory: 1024Mi
+  ##
+  resources: {}
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param extraction.podSecurityContext.enabled Enabled OSRM pods' Security Context
+  ## @param extraction.podSecurityContext.fsGroupChangePolicy Set filesystem group change policy
+  ## @param extraction.podSecurityContext.sysctls Set kernel settings using the sysctl interface
+  ## @param extraction.podSecurityContext.supplementalGroups Set filesystem extra groups
+  ## @param extraction.podSecurityContext.fsGroup Set OSRM pod's Security Context fsGroup
+  ##
+  podSecurityContext:
+    enabled: false
+    fsGroupChangePolicy: Always
+    sysctls: []
+    supplementalGroups: []
+    fsGroup: 1001
+  ## Configure Container Security Context (only main container)
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ## @param extraction.containerSecurityContext.enabled Enabled containers' Security Context
+  ## @param extraction.containerSecurityContext.seLinuxOptions [object,nullable] Set SELinux options in container
+  ## @param extraction.containerSecurityContext.runAsUser Set containers' Security Context runAsUser
+  ## @param extraction.containerSecurityContext.runAsGroup Set containers' Security Context runAsGroup
+  ## @param extraction.containerSecurityContext.runAsNonRoot Set container's Security Context runAsNonRoot
+  ## @param extraction.containerSecurityContext.privileged Set container's Security Context privileged
+  ## @param extraction.containerSecurityContext.readOnlyRootFilesystem Set container's Security Context readOnlyRootFilesystem
+  ## @param extraction.containerSecurityContext.allowPrivilegeEscalation Set container's Security Context allowPrivilegeEscalation
+  ## @param extraction.containerSecurityContext.capabilities.drop List of capabilities to be dropped
+  ## @param extraction.containerSecurityContext.seccompProfile.type Set container's Security Context seccomp profile
+  ##
+  containerSecurityContext:
+    enabled: false
+    seLinuxOptions: {}
+    runAsUser: 1001
+    runAsGroup: 1001
+    runAsNonRoot: true
+    privileged: false
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+    seccompProfile:
+      type: "RuntimeDefault"
+  # Automatic Cleanup for Finished Jobs
+  ## @param extraction.cleanupAfterFinished.enabled Enables Cleanup for Finished Jobs
+  ## @param extraction.cleanupAfterFinished.seconds Sets the value of ttlSecondsAfterFinished
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/
+  ##
+  cleanupAfterFinished:
+    enabled: true
+    seconds: 30
+  
 ## @param profiles Profile to be used for routing ("car", "bicycle", "foot")
 profiles:
   car:
     ## @param profiles.car.enabled
     ##
     enabled: true
+    ## Enable diagnostic mode in the deployment
+    ##
+    diagnosticMode:
+      ## @param profiles.car.diagnosticMode.enabled Enable diagnostic mode (all probes will be disabled and the command will be overridden)
+      ##
+      enabled: false
+      ## @param profiles.car.diagnosticMode.command Command to override all containers in the deployment
+      ##
+      command:
+        - sleep
+      ## @param profiles.car.diagnosticMode.args Args to override all containers in the deployment
+      ##
+      args:
+        - infinity
     ## osrm settings based on environment variables
     ## ref: https://github.com/laragis/containers/tree/main/laragis/osrm#environment-variables
     ##
     ## @param profile.car.command Override default container command (useful when using custom images)
     ##
     command: []
+    ## Arguments that will be used by default
+    ## @param profiles.car.defaultArgs.algorithm
+    ##
+    defaultArgs:
+      algorithm: "mld"
     ## @param profile.car.args Override default container args (useful when using custom images)
     ##
     args: []
+    ## @param profile.car.extraArgs Add extra arguments to the default arguments
+    ##
+    extraArgs: []
     ## @param profile.car.extraEnvVars Array with extra environment variables to add to the osrm container
     ## e.g:
     ## extraEnvVars:
@@ -276,7 +405,7 @@ profiles:
     ## @param profile.car.resourcesPreset Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if resources is set (resources is recommended for production).
     ## More information: https://github.com/bitnami/charts/blob/main/bitnami/common/templates/_resources.tpl#L15
     ##
-    resourcesPreset: "micro"
+    resourcesPreset: "none"
     ## @param profile.car.resources Set container requests and limits for different resources like CPU or memory (essential for production workloads)
     ## Example:
     ## resources:
@@ -398,7 +527,7 @@ profiles:
     ## readinessProbe:
     ##   enabled: true
     ##   httpGet:
-    ##     path: /
+    ##     path: /route/v1/driving/106.6415966,10.8033297;106.701801,10.7717117
     ##     port: http
     ##
     readinessProbe:
@@ -451,15 +580,37 @@ profiles:
     ## @param profiles.bicycle.enabled
     ##
     enabled: true
+    ## Enable diagnostic mode in the deployment
+    ##
+    diagnosticMode:
+      ## @param profiles.bicycle.diagnosticMode.enabled Enable diagnostic mode (all probes will be disabled and the command will be overridden)
+      ##
+      enabled: false
+      ## @param profiles.bicycle.diagnosticMode.command Command to override all containers in the deployment
+      ##
+      command:
+        - sleep
+      ## @param profiles.bicycle.diagnosticMode.args Args to override all containers in the deployment
+      ##
+      args:
+        - infinity
     ## osrm settings based on environment variables
     ## ref: https://github.com/laragis/containers/tree/main/laragis/osrm#environment-variables
     ##
     ## @param profiles.bicycle.command Override default container command (useful when using custom images)
     ##
     command: []
-    ## @param profiles.bicycle.args Override default container args (useful when using custom images)
+    ## Arguments that will be used by default
+    ## @param profiles.bicycle.defaultArgs.algorithm
+    ##
+    defaultArgs:
+      algorithm: "mld"
+    ## @param profile.bicycle.args Override default container args (useful when using custom images)
     ##
     args: []
+    ## @param profiles.bicycle.extraArgs Add extra arguments to the default arguments
+    ##
+    extraArgs: []
     ## @param profiles.bicycle.extraEnvVars Array with extra environment variables to add to the osrm container
     ## e.g:
     ## extraEnvVars:
@@ -595,7 +746,7 @@ profiles:
     ## @param profiles.bicycle.resourcesPreset Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if resources is set (resources is recommended for production).
     ## More information: https://github.com/bitnami/charts/blob/main/bitnami/common/templates/_resources.tpl#L15
     ##
-    resourcesPreset: "micro"
+    resourcesPreset: "none"
     ## @param profiles.bicycle.resources Set container requests and limits for different resources like CPU or memory (essential for production workloads)
     ## Example:
     ## resources:
@@ -717,7 +868,7 @@ profiles:
     ## readinessProbe:
     ##   enabled: true
     ##   httpGet:
-    ##     path: /
+    ##     path: /route/v1/driving/106.6415966,10.8033297;106.701801,10.7717117
     ##     port: http
     ##
     readinessProbe:
@@ -769,6 +920,20 @@ profiles:
   foot:
     ## @param profile.foot.enabled
     ##
+    ## Enable diagnostic mode in the deployment
+    ##
+    diagnosticMode:
+      ## @param profile.foot.diagnosticMode.enabled Enable diagnostic mode (all probes will be disabled and the command will be overridden)
+      ##
+      enabled: false
+      ## @param profile.foot.diagnosticMode.command Command to override all containers in the deployment
+      ##
+      command:
+        - sleep
+      ## @param profile.foot.diagnosticMode.args Args to override all containers in the deployment
+      ##
+      args:
+        - infinity
     enabled: true
     ## osrm settings based on environment variables
     ## ref: https://github.com/laragis/containers/tree/main/laragis/osrm#environment-variables
@@ -776,9 +941,17 @@ profiles:
     ## @param profile.foot.command Override default container command (useful when using custom images)
     ##
     command: []
+    ## Arguments that will be used by default
+    ## @param profiles.foot.defaultArgs.algorithm
+    ##
+    defaultArgs:
+      algorithm: "mld"
     ## @param profile.foot.args Override default container args (useful when using custom images)
     ##
     args: []
+    ## @param profiles.foot.extraArgs Add extra arguments to the default arguments
+    ##
+    extraArgs: []
     ## @param profile.foot.extraEnvVars Array with extra environment variables to add to the osrm container
     ## e.g:
     ## extraEnvVars:
@@ -914,7 +1087,7 @@ profiles:
     ## @param profile.foot.resourcesPreset Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if resources is set (resources is recommended for production).
     ## More information: https://github.com/bitnami/charts/blob/main/bitnami/common/templates/_resources.tpl#L15
     ##
-    resourcesPreset: "micro"
+    resourcesPreset: "none"
     ## @param profile.foot.resources Set container requests and limits for different resources like CPU or memory (essential for production workloads)
     ## Example:
     ## resources:
@@ -995,11 +1168,9 @@ profiles:
     ## Example:
     ## startupProbe:
     ##   enabled: true
-    ##   tcpSocket:
-    ##     port: http
     ##
     startupProbe:
-      enabled: false
+      enabled: true
       initialDelaySeconds: 30
       periodSeconds: 10
       timeoutSeconds: 5
@@ -1015,11 +1186,9 @@ profiles:
     ## Example:
     ## livenessProbe:
     ##   enabled: true
-    ##   tcpSocket:
-    ##     port: http
     ##
     livenessProbe:
-      enabled: false
+      enabled: true
       initialDelaySeconds: 120
       periodSeconds: 10
       timeoutSeconds: 5
@@ -1036,7 +1205,7 @@ profiles:
     ## readinessProbe:
     ##   enabled: true
     ##   httpGet:
-    ##     path: /
+    ##     path: /route/v1/driving/106.6415966,10.8033297;106.701801,10.7717117
     ##     port: http
     ##
     readinessProbe:
@@ -1288,7 +1457,7 @@ persistence:
   dataSource: {}
   ## @param persistence.mountPath The path the data volume will be mounted at
   ##
-  mountPath: ""
+  mountPath: "/data"
   ## @param persistence.subPath The subdirectory of the volume to mount to
   ##
   subPath: ""

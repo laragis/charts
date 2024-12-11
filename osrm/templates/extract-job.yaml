@@ -3,20 +3,21 @@ Copyright Broadcom, Inc. All Rights Reserved.
 SPDX-License-Identifier: APACHE-2.0
 */}}
 
+{{- if .Values.extraction.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "common.names.fullname" . }}-extract
-  namespace: {{ .Release.Namespace }}
+  name: {{ printf "%s-extract" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+  namespace: {{ include "common.names.namespace" . | quote }}
   labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
     app.kubernetes.io/component: extraction
-  {{- if or .Values.extraction.annotations .Values.commonAnnotations }}
-  {{- $defaultAnnotations := dict "helm.sh/hook" "post-install,post-upgrade" "helm.sh/hook-delete-policy" "before-hook-creation,hook-succeeded" }}
-  {{- $annotations := include "common.tplvalues.merge" ( dict "values" ( list .Values.extraction.annotations .Values.commonAnnotations $defaultAnnotations ) "context" . ) }}
+  {{- $annotations := include "common.tplvalues.merge" ( dict "values" ( list .Values.extraction.annotations .Values.commonAnnotations ) "context" . ) }}
   annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $) | nindent 4 }}
-  {{- end }}
 spec:
-  ttlSecondsAfterFinished: 30
+  backoffLimit: {{ .Values.extraction.backoffLimit }}
+  {{- if .Values.extraction.cleanupAfterFinished.enabled }} 
+  ttlSecondsAfterFinished: {{ .Values.extraction.cleanupAfterFinished.seconds }} 
+  {{- end }} 
   template:
     metadata:
       {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.extraction.podLabels .Values.commonLabels ) "context" . ) }}
@@ -39,31 +40,26 @@ spec:
           args:
             - -ec
             - |
-              version="{{ include "osrm.data.version" . }}"
-              uri="{{ .Values.data.uri }}"
+              mkdir -p "/data/${DATA_VERSION}"
+              cd "/data/${DATA_VERSION}"              
 
-              mkdir -p "/data/${version}"
-              cd "/data/${version}"
-
-              if [ ! -f "/data/${version}/map.osm.pbf" ]; then
-                http --download "${uri}" --output map.osm.pbf
+              if [ ! -f "/data/${DATA_VERSION}/map.osm.pbf" ]; then
+                echo "Download Is Ready"
+                http --download "${DATA_URI}" --output map.osm.pbf
               fi
 
               echo "Done!"
+          env:
+            - name: DATA_URI
+              value: {{ .Values.data.uri }}
+            - name: DATA_VERSION
+              value: {{ include "osrm.data.version" . }}
           volumeMounts:
             {{- if and .Values.persistence.enabled .Values.persistence.mountPath }}
             - name: data
               mountPath: {{ .Values.persistence.mountPath }}
               subPath: {{ .Values.persistence.subPath }}
             {{- end }}
-          {{- if .Values.extraction.containerSecurityContext.enabled }}
-          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.extraction.containerSecurityContext "context" $) | nindent 12 }}
-          {{- end }}
-          {{- if .Values.extraction.initContainer.resources }}
-          resources: {{- toYaml .Values.extraction.initContainer.resources | nindent 12 }}
-          {{- else if ne .Values.extraction.initContainer.resourcesPreset "none" }}
-          resources: {{- include "common.resources.preset" (dict "type" .Values.extraction.initContainer.resourcesPreset) | nindent 12 }}
-          {{- end }}
       containers:
         {{- range $name, $obj := .Values.profiles }}
         {{- if $obj.enabled }}
@@ -80,10 +76,9 @@ spec:
               set -o nounset
               set -o pipefail
 
-              version="{{ include "osrm.data.version" $}}"
               profile="{{ $name }}"
 
-              cd "/data/${version}"
+              cd "/data/${DATA_VERSION}"
               mkdir -p "${profile}"
               
               if [ ! -r "${profile}/extracted.lock" ]; then
@@ -95,13 +90,16 @@ spec:
                 osrm-customize "${profile}/map.osrm"
 
                 rm -rf "${profile}/map.osm.pbf"
-                touch extracted.lock
+                touch "${profile}/extracted.lock"
               fi
 
-              echo "Done!"          
+              echo "Done!"
           {{- if $.Values.extraction.containerSecurityContext.enabled }}
           securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.extraction.containerSecurityContext "context" $) | nindent 12 }}
           {{- end }}
+          env:
+            - name: DATA_VERSION
+              value: {{ include "osrm.data.version" $ }}
           {{- if or $.Values.extraction.extraEnvVarsCM $.Values.extraction.extraEnvVarsSecret }}
           envFrom:
             {{- if $.Values.extraction.extraEnvVarsCM }}
@@ -143,3 +141,4 @@ spec:
       {{- if .Values.extraction.extraVolumes }}
       {{- include "common.tplvalues.render" (dict "value" .Values.extraction.extraVolumes "context" $) | nindent 6 }}
       {{- end }}
+{{- end }}
