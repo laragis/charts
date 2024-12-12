@@ -1,2 +1,1 @@
-# charts
-LaraGIS Helm Charts
+# LaraGIS Helm Charts
