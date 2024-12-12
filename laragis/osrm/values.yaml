@@ -1266,7 +1266,7 @@ service:
   ## @param service.ports.http OSRM service HTTP port
   ##
   ports:
-    http: 80
+    http: 5000
   ## @param service.httpsTargetPort Target port for HTTPS
   ##
   httpsTargetPort: https
