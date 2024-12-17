@@ -1,0 +1,144 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if .Values.initJob.downloadData.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "%s-download-data" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: pelias
+  {{- $annotations := include "common.tplvalues.merge" ( dict "values" ( list .Values.initJob.annotations .Values.commonAnnotations ) "context" . ) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $) | nindent 4 }}
+spec:
+  backoffLimit: {{ .Values.initJob.backoffLimit }}
+  {{- if .Values.initJob.cleanupAfterFinished.enabled }} 
+  ttlSecondsAfterFinished: {{ .Values.initJob.cleanupAfterFinished.seconds }} 
+  {{- end }} 
+  template:
+    metadata:
+      {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.initJob.podLabels .Values.commonLabels ) "context" . ) }}
+      labels: {{- include "common.labels.standard" ( dict "customLabels" $podLabels "context" $ ) | nindent 8 }}
+      {{- if .Values.initJob.podAnnotations }}
+      annotations: {{- include "common.tplvalues.render" (dict "value" .Values.initJob.podAnnotations "context" $) | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- include "pelias.imagePullSecrets" . | nindent 6 }}
+      restartPolicy: OnFailure
+      {{- if .Values.initJob.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.initJob.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: download-whosonfirst
+          image: pelias/whosonfirst:master
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              [ ! -d "/data/whosonfirst" ] && ./bin/download || echo "Done!"
+          volumeMounts:
+            - name: pelias-conf
+              mountPath: /code/pelias.json
+              subPath: pelias.json
+            - name: data
+              mountPath: /data
+        - name: download-openaddresses
+          image: pelias/openaddresses:master
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              [ ! -d "/data/openaddresses" ] && ./bin/download || echo "Done!"
+          volumeMounts:
+            - name: pelias-conf
+              mountPath: /code/pelias.json
+              subPath: pelias.json
+            - name: data
+              mountPath: /data
+        - name: download-openstreetmap
+          image: pelias/openstreetmap:master
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              [ ! -d "/data/openstreetmap" ] && ./bin/download || echo "Done!"
+          volumeMounts:
+            - name: pelias-conf
+              mountPath: /code/pelias.json
+              subPath: pelias.json
+            - name: data
+              mountPath: /data
+        - name: download-geonames
+          image: pelias/geonames:master
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              [ ! -d "/data/geonames" ] && ./bin/download || echo "Done!"
+          volumeMounts:
+            - name: pelias-conf
+              mountPath: /code/pelias.json
+              subPath: pelias.json
+            - name: data
+              mountPath: /data
+        - name: download-interpolation
+          image: pelias/interpolation:master
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              [ ! -d "/data/interpolation" ] && ./bin/download-tiger || echo "Done!"
+          volumeMounts:
+            - name: pelias-conf
+              mountPath: /code/pelias.json
+              subPath: pelias.json
+            - name: data
+              mountPath: /data
+        - name: download-transit
+          image: pelias/transit:master
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              [ ! -d "/data/transit" ] && ./bin/download || echo "Done!"
+          volumeMounts:
+            - name: pelias-conf
+              mountPath: /code/pelias.json
+              subPath: pelias.json
+            - name: data
+              mountPath: /data
+        - name: download-csv-importer
+          image: pelias/csv-importer:master
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              [ ! -d "/data/csv" ] && ./bin/download || echo "Done!"
+          volumeMounts:
+            - name: pelias-conf
+              mountPath: /code/pelias.json
+              subPath: pelias.json
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: pelias-conf
+          configMap:
+            name: {{ printf "%s-conf" (include "common.names.fullname" .) }}
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "common.names.fullname" .) }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+{{- end }}

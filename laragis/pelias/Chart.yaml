@@ -1,0 +1,52 @@
+annotations:
+  category: Map
+  licenses: MIT
+  images: |
+    - name: jwilder
+      image: docker.io/jwilder/dockerize:0.6.1
+    - name: libpostal
+      image: docker.io/pelias/libpostal-service:latest
+    - name: schema
+      image: docker.io/pelias/schema:latest
+    - name: api
+      image: docker.io/pelias/api:master
+    - name: placeholder
+      image: docker.io/pelias/placeholder:master
+    - name: whosonfirst
+      image: docker.io/pelias/whosonfirst:master
+    - name: openstreetmap
+      image: docker.io/pelias/openstreetmap:master
+    - name: openaddresses
+      image: docker.io/pelias/openaddresses:master
+    - name: transit
+      image: docker.io/pelias/transit:master
+    - name: csv-importer
+      image: docker.io/pelias/csv-importer:master
+    - name: polylines
+      image: docker.io/pelias/polylines:master
+    - name: interpolation
+      image: docker.io/pelias/interpolation:master
+    - name: pip
+      image: docker.io/pelias/pip-service:master
+    - name: elasticsearch
+      image: docker.io/pelias/elasticsearch:7.16.1
+apiVersion: v2
+appVersion: 6.0.0
+dependencies:
+- name: common
+  repository: oci://registry-1.docker.io/bitnamicharts
+  tags:
+  - bitnami-common
+  version: 2.x.x
+description: A Helm chart for running Pelias in Kubernetes
+home: https://laragis.vn
+icon: https://avatars0.githubusercontent.com/u/5435747?s=200&v=4
+keywords:
+  - pelias
+maintainers:
+  - name: Truong Thanh Tung.
+    url: https://github.com/laragis/charts
+name: pelias
+sources:
+  - https://github.com/laragis/charts/tree/main/laragis/pelias
+version: 0.1.0

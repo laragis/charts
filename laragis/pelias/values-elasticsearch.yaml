@@ -1,0 +1,440 @@
+## Enable diagnostic mode in the deployment
+##
+diagnosticMode:
+  ## @param diagnosticMode.enabled Enable diagnostic mode (all probes will be disabled and the command will be overridden)
+  ##
+  enabled: false
+  ## @param diagnosticMode.command Command to override all containers in the deployment
+  ##
+  command:
+    - sleep
+  ## @param diagnosticMode.args Args to override all containers in the deployment
+  ##
+  args:
+    - infinity
+
+## @section Elasticsearch parameters
+
+## Bitnami Elasticsearch image version
+## ref: https://hub.docker.com/r/bitnami/elasticsearch/tags/
+## @param image.registry Elasticsearch image registry
+## @param image.repository Elasticsearch image repository
+## @param image.tag Elasticsearch image tag (immutable tags are recommended)
+## @param image.pullPolicy Elasticsearch image pull policy
+## @param image.pullSecrets Elasticsearch image pull secrets
+## @param image.debug Enable image debug mode
+##
+image:
+  registry: docker.io
+  repository: bitnami/elasticsearch
+  tag: 7.17.3-debian-10-r0
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: IfNotPresent
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ## e.g:
+  ## pullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  pullSecrets: []
+  ## Set to true if you would like to see extra information on logs
+  ##
+  debug: false
+
+## X-Pack security parameters
+## Note: TLS configuration is required in order to configure password authentication
+##
+security:
+  ## @param security.enabled Enable X-Pack Security settings
+  ##
+  enabled: false
+  ## @param security.elasticPassword Password for 'elastic' user
+  ## Ref: https://github.com/bitnami/bitnami-docker-elasticsearch#security
+  ##
+  elasticPassword: ""
+  ## @param security.existingSecret Name of the existing secret containing the Elasticsearch password
+  ##
+  existingSecret: ""
+
+## Elasticsearch cluster name
+## @param name Elasticsearch cluster name
+##
+name: elastic
+## @param plugins Comma, semi-colon or space separated list of plugins to install at initialization
+## ref: https://github.com/bitnami/bitnami-docker-elasticsearch#environment-variables
+##
+plugins: "analysis-icu"
+
+## @section Master parameters
+
+## Elasticsearch master-eligible node parameters
+##
+master:
+  ## @param master.replicas Desired number of Elasticsearch master-eligible nodes. Consider using an odd number of master nodes to prevent "split brain" situation.  See: https://www.elastic.co/guide/en/elasticsearch/reference/7.x/modules-discovery-voting.html
+  ## https://www.elastic.co/guide/en/elasticsearch/reference/7.x/modules-discovery-voting.html#_even_numbers_of_master_eligible_nodes
+  ## https://www.elastic.co/guide/en/elasticsearch/reference/7.x/modules-discovery-quorums.html#modules-discovery-quorums
+  ##
+  replicas: 1
+  ##
+  ## @param master.heapSize Master-eligible node heap size
+  ##
+  heapSize: 128m
+  ## @param master.podAnnotations Annotations for master-eligible pods.
+  ##
+  podAnnotations: {}
+  ## @param master.podLabels Extra labels to add to Pod
+  ##
+  podLabels: {}
+  ## @param master.affinity Master-eligible Affinity for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## Note: podAffinityPreset, podAntiAffinityPreset, and  nodeAffinityPreset will be ignored when it's set
+  ##
+  affinity: {}
+  ## @param master.nodeSelector Master-eligible Node labels for pod assignment
+  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+  ## @param master.tolerations Master-eligible Tolerations for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+  ## Elasticsearch master-eligible container's resource requests and limits
+  ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+  ## We usually recommend not to specify default resources and to leave this as a conscious
+  ## choice for the user. This also increases chances charts run on environments with little
+  ## resources, such as Minikube. If you do want to specify resources, uncomment the following
+  ## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  ## @param master.resources.limits The resources limits for the container
+  ## @param master.resources.requests [object] The requested resources for the container
+  ##
+  resources:
+    ## Example:
+    ## limits:
+    ##    cpu: 100m
+    ##    memory: 128Mi
+    limits: {}
+    requests:
+      cpu: 25m
+      memory: 256Mi
+  ## Enable persistence using Persistent Volume Claims
+  ## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
+  ##
+  persistence:
+    ## @param master.persistence.enabled Enable persistence using a `PersistentVolumeClaim`
+    ##
+    enabled: true
+    ## @param master.persistence.storageClass Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass: ""
+    ## @param master.persistence.existingClaim Existing Persistent Volume Claim
+    ## then accept the value as an existing Persistent Volume Claim to which
+    ## the container should be bound
+    ##
+    existingClaim: ""
+    ## @param master.persistence.existingVolume Existing Persistent Volume for use as volume match label selector to the `volumeClaimTemplate`. Ignored when `master.persistence.selector` is set.
+    ##
+    existingVolume: ""
+    ## @param master.persistence.selector Configure custom selector for existing Persistent Volume. Overwrites `master.persistence.existingVolume`
+    ## selector:
+    ##   matchLabels:
+    ##     volume:
+    ##
+    selector: {}
+    ## @param master.persistence.annotations Persistent Volume Claim annotations
+    ##
+    annotations: {}
+    ## @param master.persistence.accessModes Persistent Volume Access Modes
+    ##
+    accessModes:
+      - ReadWriteOnce
+    ## @param master.persistence.size Persistent Volume Size
+    ##
+    size: 8Gi
+  ## Service parameters for master-eligible node(s)
+  ##
+  service:
+    ## @param master.service.type Kubernetes Service type (master-eligible nodes)
+    ##
+    type: ClusterIP
+    ## @param master.service.port Kubernetes Service port for Elasticsearch transport port (master-eligible nodes)
+    ##
+    port: 9300
+    ## @param master.service.nodePort Kubernetes Service nodePort (master-eligible nodes)
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
+    ##
+    nodePort: ""
+    ## @param master.service.annotations Annotations for master-eligible nodes service
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer
+    ##
+    annotations: {}
+  ## Configure the ingress resource that allows you to access the
+  ## Set up the URL
+  ## ref: https://kubernetes.io/docs/user-guide/ingress/
+  ##
+  ingress:
+    ## @param master.ingress.enabled Enable ingress controller resource
+    ##
+    enabled: false
+    ## @param master.ingress.hostname Default host for the ingress resource. If specified as "*" no host rule is configured
+    ##
+    hostname: master.local
+    ## @param master.ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+    ## For a full list of possible ingress annotations, please see
+    ## ref: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md
+    ## Use this parameter to set the required annotations for cert-manager, see
+    ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
+    ##
+    ## e.g:
+    ## annotations:
+    ##   kubernetes.io/ingress.class: nginx
+    ##   cert-manager.io/cluster-issuer: cluster-issuer-name
+    ##
+    annotations: {}
+    ## @param master.ingress.extraHosts The list of additional hostnames to be covered with this ingress record.
+    ## Most likely the hostname above will be enough, but in the event more hosts are needed, this is an array
+    ## extraHosts:
+    ## - name: master.local
+    ##   path: /
+    ##
+    extraHosts: []
+  ## Autoscaling configuration
+  ## @param master.autoscaling.enabled Enable autoscaling for master replicas
+  ## @param master.autoscaling.minReplicas Minimum number of master replicas
+  ## @param master.autoscaling.maxReplicas Maximum number of master replicas
+  ## @param master.autoscaling.targetCPU Target CPU utilization percentage for master replica autoscaling
+  ## @param master.autoscaling.targetMemory Target Memory utilization percentage for master replica autoscaling
+  ##
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 11
+    targetCPU: ""
+    targetMemory: ""
+
+## @section Coordinating parameters
+
+## Elasticsearch coordinating-only node parameters
+##
+coordinating:
+  ## @param coordinating.replicas Desired number of Elasticsearch coordinating-only nodes
+  ##
+  replicas: 1
+  ## @param coordinating.heapSize Coordinating-only node heap size
+  ##
+  heapSize: 128m
+  ## @param coordinating.podAnnotations Annotations for coordinating pods.
+  ##
+  podAnnotations: {}
+  ## @param coordinating.podLabels Extra labels to add to Pod
+  ##
+  podLabels: {}
+  ## @param coordinating.affinity Coordinating Affinity for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## Note: podAffinityPreset, podAntiAffinityPreset, and  nodeAffinityPreset will be ignored when it's set
+  ##
+  affinity: {}
+  ## @param coordinating.nodeSelector Coordinating Node labels for pod assignment
+  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+  ## @param coordinating.tolerations Coordinating Tolerations for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+  ## Elasticsearch coordinating-only container's resource requests and limits
+  ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+  ## We usually recommend not to specify default resources and to leave this as a conscious
+  ## choice for the user. This also increases chances charts run on environments with little
+  ## resources, such as Minikube. If you do want to specify resources, uncomment the following
+  ## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  ## @param coordinating.resources.limits The resources limits for the container
+  ## @param coordinating.resources.requests [object] The requested resources for the container
+  ##
+  resources:
+    ## Example:
+    ## limits:
+    ##    cpu: 100m
+    ##    memory: 384Mi
+    limits: {}
+    requests:
+      cpu: 25m
+      memory: 256Mi
+  ## Service parameters for coordinating-only node(s)
+  ##
+  service:
+    ## @param coordinating.service.type Kubernetes Service type (coordinating-only nodes)
+    ##
+    type: ClusterIP
+    ## @param coordinating.service.port Kubernetes Service port for REST API (coordinating-only nodes)
+    ##
+    port: 9200
+    ## @param coordinating.service.nodePort Kubernetes Service nodePort (coordinating-only nodes)
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
+    ##
+    nodePort: ""
+    ## @param coordinating.service.annotations Annotations for coordinating-only nodes service
+    ## Set the LoadBalancer service type to internal only.
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer
+    ##
+    annotations: {}
+  ## Autoscaling configuration
+  ## @param coordinating.autoscaling.enabled Enable autoscaling for coordinating replicas
+  ## @param coordinating.autoscaling.minReplicas Minimum number of coordinating replicas
+  ## @param coordinating.autoscaling.maxReplicas Maximum number of coordinating replicas
+  ## @param coordinating.autoscaling.targetCPU Target CPU utilization percentage for coordinating replica autoscaling
+  ## @param coordinating.autoscaling.targetMemory Target Memory utilization percentage for coordinating replica autoscaling
+  ##
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 11
+    targetCPU: ""
+    targetMemory: ""
+
+## @section Data parameters
+
+## Elasticsearch data node parameters
+##
+data:
+  ## @param data.replicas Desired number of Elasticsearch data nodes
+  ##
+  replicas: 1
+  ## @param data.heapSize Data node heap size
+  ##
+  heapSize: 1024m
+  ## @param data.podAnnotations Annotations for data pods.
+  ##
+  podAnnotations: {}
+  ## @param data.podLabels Extra labels to add to Pod
+  ##
+  podLabels: {}
+  ## @param data.affinity Data Affinity for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## Note: podAffinityPreset, podAntiAffinityPreset, and  nodeAffinityPreset will be ignored when it's set
+  ##
+  affinity: {}
+  ## @param data.nodeSelector Data Node labels for pod assignment
+  ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+  ## @param data.tolerations Data Tolerations for pod assignment
+  ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+  ## Elasticsearch data container's resource requests and limits
+  ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+  ## We usually recommend not to specify default resources and to leave this as a conscious
+  ## choice for the user. This also increases chances charts run on environments with little
+  ## resources, such as Minikube. If you do want to specify resources, uncomment the following
+  ## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  ## @param data.resources.limits The resources limits for the container
+  ## @param data.resources.requests [object] The requested resources for the container
+  ##
+  resources:
+    ## Example:
+    ## limits:
+    ##    cpu: 100m
+    ##    memory: 2176Mi
+    limits: {}
+    requests:
+      cpu: 25m
+      memory: 2048Mi
+  ## Service parameters for data-eligible node(s)
+  ##
+  service:
+    ## @param data.service.annotations Annotations for data-eligible nodes service
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer
+    ##
+    annotations: {}
+  ## Enable persistence using Persistent Volume Claims
+  ## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
+  ##
+  persistence:
+    ## @param data.persistence.enabled Enable persistence using a `PersistentVolumeClaim`
+    ##
+    enabled: true
+    ## @param data.persistence.storageClass Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass: ""
+    ## @param data.persistence.existingClaim Existing Persistent Volume Claim
+    ## If persistence is enable, and this value is defined,
+    ## then accept the value as an existing Persistent Volume Claim to which
+    ## the container should be bound
+    ##
+    existingClaim: ""
+    ## @param data.persistence.existingVolume Existing Persistent Volume for use as volume match label selector to the `volumeClaimTemplate`. Ignored when `data.persistence.selector` ist set.
+    ##
+    existingVolume: ""
+    ## @param data.persistence.selector Configure custom selector for existing Persistent Volume. Overwrites `data.persistence.existingVolume`
+    ## selector:
+    ##   matchLabels:
+    ##     volume:
+    selector: {}
+    ## @param data.persistence.annotations Persistent Volume Claim annotations
+    ##
+    annotations: {}
+    ## @param data.persistence.accessModes Persistent Volume Access Modes
+    ##
+    accessModes:
+      - ReadWriteOnce
+    ## @param data.persistence.size Persistent Volume Size
+    ##
+    size: 8Gi
+  ## Autoscaling configuration
+  ## @param data.autoscaling.enabled Enable autoscaling for data replicas
+  ## @param data.autoscaling.minReplicas Minimum number of data replicas
+  ## @param data.autoscaling.maxReplicas Maximum number of data replicas
+  ## @param data.autoscaling.targetCPU Target CPU utilization percentage for data replica autoscaling
+  ## @param data.autoscaling.targetMemory Target Memory utilization percentage for data replica autoscaling
+  ##
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 11
+    targetCPU: ""
+    targetMemory: ""
+
+## @section Sysctl Image parameters
+
+## Kernel settings modifier image
+##
+sysctlImage:
+  ## @param sysctlImage.enabled Enable kernel settings modifier image
+  ##
+  enabled: true
+
+## @section VolumePermissions parameters
+
+## Init containers parameters:
+## volumePermissions: Change the owner and group of the persistent volume mountpoint to runAsUser:fsGroup values from the securityContext section.
+##
+volumePermissions:
+  ## @param volumePermissions.enabled Enable init container that changes volume permissions in the data directory (for cases where the default k8s `runAsUser` and `fsUser` values do not work)
+  ##
+  enabled: false
+
+## @section Kibana Parameters
+
+## Bundled Kibana parameters
+## @param kibana.elasticsearch.hosts [array] Array containing hostnames for the ES instances. Used to generate the URL
+## @param kibana.elasticsearch.port Port to connect Kibana and ES instance. Used to generate the URL
+##
+kibana:
+  elasticsearch:
+    hosts:
+      - '{{ include "elasticsearch.coordinating.fullname" . }}'
+    port: 9200

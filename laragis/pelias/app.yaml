@@ -1,0 +1,169 @@
+---
+# Source: pelias/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pelias-conf
+  namespace: "gtelmaps"
+  labels:
+    app.kubernetes.io/instance: pelias
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: pelias
+    app.kubernetes.io/version: 6.0.0
+    helm.sh/chart: pelias-0.1.0
+    app.kubernetes.io/part-of: pelias
+data:
+  pelias.json: |
+    {
+      "logger": {
+        "level": "info",
+        "timestamp": false
+      },
+      "esclient": {
+        "apiVersion": "7.x",
+        "hosts": [{ "host": "pelias-elasticsearch-coordinating-only", "port": 9200 }]
+      },
+      "elasticsearch": {
+        "settings": {
+          "index": {
+            "refresh_interval": "10s",
+            "number_of_replicas": "0",
+            "number_of_shards": "1"
+          }
+        }
+      },
+      "acceptance-tests": {
+        "endpoints": {
+          "docker": "http://pelias-api:4000/v1/"
+        }
+      },
+      "api": {
+        "services": {
+          "placeholder": { "url": "http://placeholder:4100" },
+          "pip": { "url": "http://pip:4200" },
+          "interpolation": { "url": "http://interpolation:4300" },
+          "libpostal": { "url": "http://libpostal:4400" }
+        },
+        "targets": {
+          "auto_discover": true,
+          "layers_by_source": {
+            "gm": ["address"]
+          }
+        }
+      },
+      "imports": {
+        "adminLookup": {
+          "enabled": false
+        },
+        "blacklist": {
+          "files": ["/data/blacklist/osm.txt"]
+        },
+        "csv": {
+          "datapath": "/data/csv",
+          "files": [],
+          "download": [
+            "https://raw.githubusercontent.com/gtelots/csv-importer/master/data/example.csv"
+          ]
+        },
+        "geonames": {
+          "datapath": "/data/geonames",
+          "countryCode": "VN"
+        },
+        "openstreetmap": {
+          "download": [
+            {
+              "sourceURL": "http://download.geofabrik.de/asia/vietnam-latest.osm.pbf"
+            }
+          ],
+          "leveldbpath": "/tmp",
+          "datapath": "/data/openstreetmap",
+          "import": [
+            {
+              "filename": "vietnam-latest.osm.pbf"
+            }
+          ]
+        },
+        "openaddresses": {
+          "datapath": "/data/openaddresses",
+          "files": ["vi/statewide.csv"]
+        },
+        "polyline": {
+          "datapath": "/data/polylines",
+          "files": ["extract.0sv"]
+        },
+        "whosonfirst": {
+          "datapath": "/data/whosonfirst",
+          "importPostalcodes": true,
+          "countryCode": "VN",
+          "importPlace": ["85632763"]
+        }
+      }
+    }
+---
+# Source: pelias/templates/prepare-data-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pelias-prepare-data
+  namespace: "gtelmaps"
+  labels:
+    app.kubernetes.io/instance: pelias
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: pelias
+    app.kubernetes.io/version: 6.0.0
+    helm.sh/chart: pelias-0.1.0
+    app.kubernetes.io/part-of: pelias
+  annotations:
+    {}
+spec:
+  backoffLimit: 10 
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: pelias
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: pelias
+        app.kubernetes.io/version: 6.0.0
+        helm.sh/chart: pelias-0.1.0
+    spec:
+      
+      restartPolicy: OnFailure
+      initContainers:
+        - name: download-whosonfirst
+          image: pelias/whosonfirst:master
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+          args:
+            - -ec
+            - |
+              [ ! -d "/app/data" ] && ./bin/download
+          volumeMounts:
+            - name: pelias-conf
+              mountPath: /code/pelias.json
+              subPath: pelias.json
+            - name: data
+              mountPath: /data
+      containers:
+        - name: download-whosonfirst
+          image: pelias/whosonfirst:master
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+          args:
+            - -ec
+            - |
+              sleep 3600
+          volumeMounts:
+            - name: pelias-conf
+              mountPath: /code/pelias.json
+              subPath: pelias.json
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: pelias-conf
+          configMap:
+            name: pelias-conf
+        - name: data
+          persistentVolumeClaim:
+            claimName: pelias-data

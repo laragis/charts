@@ -1,0 +1,102 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-conf" (include "common.names.fullname" .) }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: pelias
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+data:
+  pelias.json: |
+    {
+      "logger": {
+        "level": "info",
+        "timestamp": false
+      },
+      "esclient": {
+        "apiVersion": "7.x",
+        "hosts": [{ "host": "{{ .Values.externalElasticsearch.host }}", "port": {{ .Values.externalElasticsearch.port }} }]
+      },
+      "elasticsearch": {
+        "settings": {
+          "index": {
+            "refresh_interval": "10s",
+            "number_of_replicas": "0",
+            "number_of_shards": "1"
+          }
+        }
+      },
+      "acceptance-tests": {
+        "endpoints": {
+          "docker": "http://pelias-api:4000/v1/"
+        }
+      },
+      "api": {
+        "services": {
+          "placeholder": { "url": "http://placeholder:4100" },
+          "pip": { "url": "http://pip:4200" },
+          "interpolation": { "url": "http://interpolation:4300" },
+          "libpostal": { "url": "http://libpostal:4400" }
+        },
+        "targets": {
+          "auto_discover": true,
+          "layers_by_source": {
+            "gm": ["address"]
+          }
+        }
+      },
+      "imports": {
+        "adminLookup": {
+          "enabled": false
+        },
+        "blacklist": {
+          "files": ["/data/blacklist/osm.txt"]
+        },
+        "csv": {
+          "datapath": "/data/csv",
+          "files": [],
+          "download": [
+            "https://raw.githubusercontent.com/gtelots/csv-importer/master/data/example.csv"
+          ]
+        },
+        "geonames": {
+          "datapath": "/data/geonames",
+          "countryCode": "VN"
+        },
+        "openstreetmap": {
+          "download": [
+            {
+              "sourceURL": "http://download.geofabrik.de/asia/vietnam-latest.osm.pbf"
+            }
+          ],
+          "leveldbpath": "/tmp",
+          "datapath": "/data/openstreetmap",
+          "import": [
+            {
+              "filename": "vietnam-latest.osm.pbf"
+            }
+          ]
+        },
+        "openaddresses": {
+          "datapath": "/data/openaddresses",
+          "files": ["vi/statewide.csv"]
+        },
+        "polyline": {
+          "datapath": "/data/polylines",
+          "files": ["extract.0sv"]
+        },
+        "whosonfirst": {
+          "datapath": "/data/whosonfirst",
+          "importPostalcodes": true,
+          "countryCode": "VN",
+          "importPlace": ["85632763"]
+        }
+      }
+    }
