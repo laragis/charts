@@ -98,7 +98,11 @@ initJob:
   ## @param initJob.prepareData
   ## @param initJob.prepareData.enabled
   prepareData:
-    enabled: true
+    enabled: false
+  ## @param initJob.prepareData
+  ## @param initJob.prepareData.enabled
+  importData:
+    enabled: false
   ## @param initJob.backoffLimit set backoff limit of the job
   ##
   backoffLimit: 10
@@ -109,7 +113,7 @@ initJob:
   ##
   cleanupAfterFinished:
     enabled: true
-    seconds: 180
+    seconds: 120
   ## @param initJob.extraVolumes Optionally specify extra list of additional volumes for the Mastodon init job
   ##
   extraVolumes: []

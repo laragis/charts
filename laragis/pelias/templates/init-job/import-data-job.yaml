@@ -3,11 +3,11 @@ Copyright Broadcom, Inc. All Rights Reserved.
 SPDX-License-Identifier: APACHE-2.0
 */}}
 
-{{- if .Values.initJob.prepareData.enabled }}
+{{- if .Values.initJob.importData.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ printf "%s-download-data" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
+  name: {{ printf "%s-import-data" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" }}
   namespace: {{ include "common.names.namespace" . | quote }}
   labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
     app.kubernetes.io/part-of: pelias
@@ -32,43 +32,98 @@ spec:
       securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.initJob.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
       initContainers:
-        - name: prepare-polylines
+        - name: import-whosonfirst
+          image: pelias/whosonfirst:master
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              ./bin/start
+          volumeMounts:
+            - name: pelias-conf
+              mountPath: /code/pelias.json
+              subPath: pelias.json
+            - name: data
+              mountPath: /data
+        - name: import-openaddresses
+          image: pelias/openaddresses:master
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              ./bin/parallel ${OPENADDRESSES_PARALLELISM:-1}
+          volumeMounts:
+            - name: pelias-conf
+              mountPath: /code/pelias.json
+              subPath: pelias.json
+            - name: data
+              mountPath: /data
+        - name: import-openstreetmap
+          image: pelias/openstreetmap:master
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              ./bin/start
+          volumeMounts:
+            - name: pelias-conf
+              mountPath: /code/pelias.json
+              subPath: pelias.json
+            - name: data
+              mountPath: /data
+        - name: import-polylines
           image: pelias/polylines:master
           imagePullPolicy: IfNotPresent
           command:
             - /bin/bash
             - -ec
             - |
-              bash ./docker_extract.sh
+              ./bin/start
           volumeMounts:
             - name: pelias-conf
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
               mountPath: /data
-        - name: prepare-placeholder
-          image: pelias/placeholder:master
+        - name: import-geonames
+          image: pelias/geonames:master
           imagePullPolicy: IfNotPresent
           command:
             - /bin/bash
             - -ec
             - |
-              ./cmd/extract.sh
-              ./cmd/build.sh
+              ./bin/start
           volumeMounts:
             - name: pelias-conf
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
               mountPath: /data
-        - name: prepare-interpolation
-          image: pelias/interpolation:master
+        - name: import-transit
+          image: pelias/transit:master
           imagePullPolicy: IfNotPresent
           command:
             - /bin/bash
             - -ec
             - |
-              bash ./docker_build.sh
+              ./bin/start
+          volumeMounts:
+            - name: pelias-conf
+              mountPath: /code/pelias.json
+              subPath: pelias.json
+            - name: data
+              mountPath: /data
+        - name: import-csv
+          image: pelias/csv-importer:master
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              ./bin/parallel ${CSV_PARALLELISM:-1}
           volumeMounts:
             - name: pelias-conf
               mountPath: /code/pelias.json
@@ -76,7 +131,7 @@ spec:
             - name: data
               mountPath: /data
       containers:
-        - name: prepare-final
+        - name: import-final
           image: busybox
           imagePullPolicy: IfNotPresent
           command: ["sh", "-c", "echo 'Job completed!'"]

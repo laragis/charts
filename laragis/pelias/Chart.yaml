@@ -24,6 +24,8 @@ annotations:
       image: docker.io/pelias/csv-importer:master
     - name: polylines
       image: docker.io/pelias/polylines:master
+    - name: geonames
+      image: docker.io/pelias/geonames:master
     - name: interpolation
       image: docker.io/pelias/interpolation:master
     - name: pip
