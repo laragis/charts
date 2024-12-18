@@ -1,0 +1,32 @@
+interpolation:
+  livenessProbe:
+    enabled: false
+  readinessProbe:
+    enabled: false
+  startupProbe:
+    enabled: false
+  service:
+    type: NodePort
+
+pip:
+  livenessProbe:
+    enabled: true
+  readinessProbe:
+    enabled: true
+  startupProbe:
+    enabled: true
+  service:
+    type: NodePort
+
+placeholder:
+  livenessProbe:
+    enabled: true
+  readinessProbe:
+    enabled: true
+  startupProbe:
+    enabled: true
+  service:
+    type: NodePort
+
+persistence:
+  existingClaim: "pelias-data"

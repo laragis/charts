@@ -331,7 +331,7 @@ api:
   ##    command: ['sh', '-c', 'echo "hello world"']
   ##
   initContainers: []
-  ## @param web.containerPorts.http Airflow webserver HTTP container port
+  ## @param api.containerPorts.http API HTTP container port
   ##
   containerPorts:
     http: 80
@@ -518,11 +518,10 @@ api:
   ## API Service
   ##
   service:
-    ## @param api.service.type WordPress service type
+    ## @param api.service.type API service type
     ##
     type: ClusterIP
-    ## @param api.service.ports.http WordPress service HTTP port
-    ## @param api.service.ports.https WordPress service HTTPS port
+    ## @param api.service.ports.http API service HTTP port
     ##
     ports:
       http: 80
@@ -544,30 +543,30 @@ api:
     ##     timeoutSeconds: 300
     ##
     sessionAffinityConfig: {}
-    ## @param api.service.clusterIP WordPress service Cluster IP
+    ## @param api.service.clusterIP API service Cluster IP
     ## e.g.:
     ## clusterIP: None
     ##
     clusterIP: ""
-    ## @param api.service.loadBalancerIP WordPress service Load Balancer IP
+    ## @param api.service.loadBalancerIP API service Load Balancer IP
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
     ##
     loadBalancerIP: ""
-    ## @param api.service.loadBalancerSourceRanges WordPress service Load Balancer sources
+    ## @param api.service.loadBalancerSourceRanges API service Load Balancer sources
     ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
     ## e.g:
     ## loadBalancerSourceRanges:
     ##   - 10.10.10.0/24
     ##
     loadBalancerSourceRanges: []
-    ## @param api.service.externalTrafficPolicy WordPress service external traffic policy
+    ## @param api.service.externalTrafficPolicy API service external traffic policy
     ## ref https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
     ##
     externalTrafficPolicy: Cluster
-    ## @param api.service.annotations Additional custom annotations for WordPress service
+    ## @param api.service.annotations Additional custom annotations for API service
     ##
     annotations: {}
-    ## @param api.service.extraPorts Extra port to expose on WordPress service
+    ## @param api.service.extraPorts Extra port to expose on API service
     ##
     extraPorts: []
   ## API ingress parameters
@@ -831,10 +830,10 @@ interpolation:
   ##    command: ['sh', '-c', 'echo "hello world"']
   ##
   initContainers: []
-  ## @param web.containerPorts.http Airflow webserver HTTP container port
+  ## @param interpolation.containerPorts.http Interpolation HTTP container port
   ##
   containerPorts:
-    http: 80
+    http: 3000
   ## @param interpolation.lifecycleHooks for Interpolation containers to automate configuration before or after startup
   ##
   lifecycleHooks: {}
@@ -1018,11 +1017,10 @@ interpolation:
   ## Interpolation Service
   ##
   service:
-    ## @param interpolation.service.type WordPress service type
+    ## @param interpolation.service.type Interpolation service type
     ##
     type: ClusterIP
-    ## @param interpolation.service.ports.http WordPress service HTTP port
-    ## @param interpolation.service.ports.https WordPress service HTTPS port
+    ## @param interpolation.service.ports.http Interpolation service HTTP port    
     ##
     ports:
       http: 80
@@ -1044,30 +1042,30 @@ interpolation:
     ##     timeoutSeconds: 300
     ##
     sessionAffinityConfig: {}
-    ## @param interpolation.service.clusterIP WordPress service Cluster IP
+    ## @param interpolation.service.clusterIP Interpolation service Cluster IP
     ## e.g.:
     ## clusterIP: None
     ##
     clusterIP: ""
-    ## @param interpolation.service.loadBalancerIP WordPress service Load Balancer IP
+    ## @param interpolation.service.loadBalancerIP Interpolation service Load Balancer IP
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
     ##
     loadBalancerIP: ""
-    ## @param interpolation.service.loadBalancerSourceRanges WordPress service Load Balancer sources
+    ## @param interpolation.service.loadBalancerSourceRanges Interpolation service Load Balancer sources
     ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
     ## e.g:
     ## loadBalancerSourceRanges:
     ##   - 10.10.10.0/24
     ##
     loadBalancerSourceRanges: []
-    ## @param interpolation.service.externalTrafficPolicy WordPress service external traffic policy
+    ## @param interpolation.service.externalTrafficPolicy Interpolation service external traffic policy
     ## ref https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
     ##
     externalTrafficPolicy: Cluster
-    ## @param interpolation.service.annotations Additional custom annotations for WordPress service
+    ## @param interpolation.service.annotations Additional custom annotations for Interpolation service
     ##
     annotations: {}
-    ## @param interpolation.service.extraPorts Extra port to expose on WordPress service
+    ## @param interpolation.service.extraPorts Extra port to expose on Interpolation service
     ##
     extraPorts: []
   ## Interpolation ingress parameters
@@ -1250,7 +1248,7 @@ libpostal:
   ##
   image:
     registry: docker.io
-    repository: pelias/libpostal
+    repository: pelias/libpostal-service
     tag: master
     digest: ""
     ## Specify a imagePullPolicy
@@ -1331,10 +1329,10 @@ libpostal:
   ##    command: ['sh', '-c', 'echo "hello world"']
   ##
   initContainers: []
-  ## @param web.containerPorts.http Airflow webserver HTTP container port
+  ## @param libpostal.containerPorts.http Libpostal HTTP container port
   ##
   containerPorts:
-    http: 80
+    http: 4400
   ## @param libpostal.lifecycleHooks for Libpostal containers to automate configuration before or after startup
   ##
   lifecycleHooks: {}
@@ -1518,14 +1516,13 @@ libpostal:
   ## Libpostal Service
   ##
   service:
-    ## @param libpostal.service.type WordPress service type
+    ## @param libpostal.service.type Libpostal service type
     ##
     type: ClusterIP
-    ## @param libpostal.service.ports.http WordPress service HTTP port
-    ## @param libpostal.service.ports.https WordPress service HTTPS port
+    ## @param libpostal.service.ports.http Libpostal service HTTP port
     ##
     ports:
-      http: 80
+      http: 8080
     ## Node ports to expose
     ## @param libpostal.service.nodePorts.http Node port for HTTP
     ## @param libpostal.service.nodePorts.https Node port for HTTPS
@@ -1544,30 +1541,30 @@ libpostal:
     ##     timeoutSeconds: 300
     ##
     sessionAffinityConfig: {}
-    ## @param libpostal.service.clusterIP WordPress service Cluster IP
+    ## @param libpostal.service.clusterIP Libpostal service Cluster IP
     ## e.g.:
     ## clusterIP: None
     ##
     clusterIP: ""
-    ## @param libpostal.service.loadBalancerIP WordPress service Load Balancer IP
+    ## @param libpostal.service.loadBalancerIP Libpostal service Load Balancer IP
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
     ##
     loadBalancerIP: ""
-    ## @param libpostal.service.loadBalancerSourceRanges WordPress service Load Balancer sources
+    ## @param libpostal.service.loadBalancerSourceRanges Libpostal service Load Balancer sources
     ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
     ## e.g:
     ## loadBalancerSourceRanges:
     ##   - 10.10.10.0/24
     ##
     loadBalancerSourceRanges: []
-    ## @param libpostal.service.externalTrafficPolicy WordPress service external traffic policy
+    ## @param libpostal.service.externalTrafficPolicy Libpostal service external traffic policy
     ## ref https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
     ##
     externalTrafficPolicy: Cluster
-    ## @param libpostal.service.annotations Additional custom annotations for WordPress service
+    ## @param libpostal.service.annotations Additional custom annotations for Libpostal service
     ##
     annotations: {}
-    ## @param libpostal.service.extraPorts Extra port to expose on WordPress service
+    ## @param libpostal.service.extraPorts Extra port to expose on Libpostal service
     ##
     extraPorts: []
   ## Libpostal ingress parameters
@@ -1750,7 +1747,7 @@ pip:
   ##
   image:
     registry: docker.io
-    repository: pelias/pip
+    repository: pelias/pip-service
     tag: master
     digest: ""
     ## Specify a imagePullPolicy
@@ -1831,10 +1828,10 @@ pip:
   ##    command: ['sh', '-c', 'echo "hello world"']
   ##
   initContainers: []
-  ## @param web.containerPorts.http Airflow webserver HTTP container port
+  ## @param pip.containerPorts.http PIP HTTP container port
   ##
   containerPorts:
-    http: 80
+    http: 3102
   ## @param pip.lifecycleHooks for PIP containers to automate configuration before or after startup
   ##
   lifecycleHooks: {}
@@ -2018,14 +2015,13 @@ pip:
   ## PIP Service
   ##
   service:
-    ## @param pip.service.type WordPress service type
+    ## @param pip.service.type PIP service type
     ##
     type: ClusterIP
-    ## @param pip.service.ports.http WordPress service HTTP port
-    ## @param pip.service.ports.https WordPress service HTTPS port
+    ## @param pip.service.ports.http PIP service HTTP port
     ##
     ports:
-      http: 80
+      http: 8080
     ## Node ports to expose
     ## @param pip.service.nodePorts.http Node port for HTTP
     ## @param pip.service.nodePorts.https Node port for HTTPS
@@ -2044,30 +2040,30 @@ pip:
     ##     timeoutSeconds: 300
     ##
     sessionAffinityConfig: {}
-    ## @param pip.service.clusterIP WordPress service Cluster IP
+    ## @param pip.service.clusterIP PIP service Cluster IP
     ## e.g.:
     ## clusterIP: None
     ##
     clusterIP: ""
-    ## @param pip.service.loadBalancerIP WordPress service Load Balancer IP
+    ## @param pip.service.loadBalancerIP PIP service Load Balancer IP
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
     ##
     loadBalancerIP: ""
-    ## @param pip.service.loadBalancerSourceRanges WordPress service Load Balancer sources
+    ## @param pip.service.loadBalancerSourceRanges PIP service Load Balancer sources
     ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
     ## e.g:
     ## loadBalancerSourceRanges:
     ##   - 10.10.10.0/24
     ##
     loadBalancerSourceRanges: []
-    ## @param pip.service.externalTrafficPolicy WordPress service external traffic policy
+    ## @param pip.service.externalTrafficPolicy PIP service external traffic policy
     ## ref https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
     ##
     externalTrafficPolicy: Cluster
-    ## @param pip.service.annotations Additional custom annotations for WordPress service
+    ## @param pip.service.annotations Additional custom annotations for PIP service
     ##
     annotations: {}
-    ## @param pip.service.extraPorts Extra port to expose on WordPress service
+    ## @param pip.service.extraPorts Extra port to expose on PIP service
     ##
     extraPorts: []
   ## PIP ingress parameters
@@ -2331,10 +2327,10 @@ placeholder:
   ##    command: ['sh', '-c', 'echo "hello world"']
   ##
   initContainers: []
-  ## @param web.containerPorts.http Airflow webserver HTTP container port
+  ## @param placeholder.containerPorts.http Placeholder HTTP container port
   ##
   containerPorts:
-    http: 80
+    http: 3000
   ## @param placeholder.lifecycleHooks for Placeholder containers to automate configuration before or after startup
   ##
   lifecycleHooks: {}
@@ -2518,14 +2514,13 @@ placeholder:
   ## Placeholder Service
   ##
   service:
-    ## @param placeholder.service.type WordPress service type
+    ## @param placeholder.service.type Placeholder service type
     ##
     type: ClusterIP
-    ## @param placeholder.service.ports.http WordPress service HTTP port
-    ## @param placeholder.service.ports.https WordPress service HTTPS port
+    ## @param placeholder.service.ports.http Placeholder service HTTP port
     ##
     ports:
-      http: 80
+      http: 8080
     ## Node ports to expose
     ## @param placeholder.service.nodePorts.http Node port for HTTP
     ## @param placeholder.service.nodePorts.https Node port for HTTPS
@@ -2544,30 +2539,30 @@ placeholder:
     ##     timeoutSeconds: 300
     ##
     sessionAffinityConfig: {}
-    ## @param placeholder.service.clusterIP WordPress service Cluster IP
+    ## @param placeholder.service.clusterIP Placeholder service Cluster IP
     ## e.g.:
     ## clusterIP: None
     ##
     clusterIP: ""
-    ## @param placeholder.service.loadBalancerIP WordPress service Load Balancer IP
+    ## @param placeholder.service.loadBalancerIP Placeholder service Load Balancer IP
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
     ##
     loadBalancerIP: ""
-    ## @param placeholder.service.loadBalancerSourceRanges WordPress service Load Balancer sources
+    ## @param placeholder.service.loadBalancerSourceRanges Placeholder service Load Balancer sources
     ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
     ## e.g:
     ## loadBalancerSourceRanges:
     ##   - 10.10.10.0/24
     ##
     loadBalancerSourceRanges: []
-    ## @param placeholder.service.externalTrafficPolicy WordPress service external traffic policy
+    ## @param placeholder.service.externalTrafficPolicy Placeholder service external traffic policy
     ## ref https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
     ##
     externalTrafficPolicy: Cluster
-    ## @param placeholder.service.annotations Additional custom annotations for WordPress service
+    ## @param placeholder.service.annotations Additional custom annotations for Placeholder service
     ##
     annotations: {}
-    ## @param placeholder.service.extraPorts Extra port to expose on WordPress service
+    ## @param placeholder.service.extraPorts Extra port to expose on Placeholder service
     ##
     extraPorts: []
   ## Placeholder ingress parameters
@@ -2762,7 +2757,7 @@ persistence:
   dataSource: {}
   ## @param persistence.existingClaim The name of an existing PVC to use for persistence
   ##
-  existingClaim: "pelias-data"
+  existingClaim: ""
   ## @param persistence.selector Selector to match an existing Persistent Volume for OSRM data PVC
   ## If set, the PVC can't have a PV dynamically provisioned for it
   ## E.g.

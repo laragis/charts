@@ -39,7 +39,7 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.pip.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
-      {{- include "pelias.imagePullSecrets" . | nindent 6 }}
+      {{- include "pelias.pip.imagePullSecrets" . | nindent 6 }}
       automountServiceAccountToken: {{ .Values.pip.automountServiceAccountToken }}
       {{- if .Values.pip.hostAliases }}
       hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.pip.hostAliases "context" $) | nindent 8 }}
@@ -67,7 +67,7 @@ spec:
       {{- if .Values.pip.podSecurityContext.enabled }}
       securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.pip.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "pelias.serviceAccountName" . }}
+      serviceAccountName: {{ include "pelias.pip.serviceAccountName" . }}
       {{- if .Values.pip.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.pip.terminationGracePeriodSeconds }}
       {{- end }}
@@ -151,11 +151,17 @@ spec:
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.pip.customLivenessProbe "context" $) | nindent 12 }}
           {{- else if .Values.pip.livenessProbe.enabled }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.pip.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /106.68332129037256/10.766113666443553
+              port: http
           {{- end }}
           {{- if .Values.pip.customReadinessProbe }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.pip.customReadinessProbe "context" $) | nindent 12 }}
           {{- else if .Values.pip.readinessProbe.enabled }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.pip.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /106.68332129037256/10.766113666443553
+              port: http
           {{- end }}
           {{- end }}
           {{- if .Values.pip.lifecycleHooks }}

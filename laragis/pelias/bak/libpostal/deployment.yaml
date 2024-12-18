@@ -39,7 +39,7 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.libpostal.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
-      {{- include "pelias.imagePullSecrets" . | nindent 6 }}
+      {{- include "pelias.libpostal.imagePullSecrets" . | nindent 6 }}
       automountServiceAccountToken: {{ .Values.libpostal.automountServiceAccountToken }}
       {{- if .Values.libpostal.hostAliases }}
       hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.libpostal.hostAliases "context" $) | nindent 8 }}
@@ -67,7 +67,7 @@ spec:
       {{- if .Values.libpostal.podSecurityContext.enabled }}
       securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.libpostal.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "pelias.serviceAccountName" . }}
+      serviceAccountName: {{ include "pelias.libpostal.serviceAccountName" . }}
       {{- if .Values.libpostal.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.libpostal.terminationGracePeriodSeconds }}
       {{- end }}

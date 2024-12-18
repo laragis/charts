@@ -38,7 +38,7 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.api.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
-      {{- include "pelias.imagePullSecrets" . | nindent 6 }}
+      {{- include "pelias.api.imagePullSecrets" . | nindent 6 }}
       automountServiceAccountToken: {{ .Values.api.automountServiceAccountToken }}
       {{- if .Values.api.hostAliases }}
       hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.api.hostAliases "context" $) | nindent 8 }}
@@ -66,7 +66,7 @@ spec:
       {{- if .Values.api.podSecurityContext.enabled }}
       securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.api.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "pelias.serviceAccountName" . }}
+      serviceAccountName: {{ include "pelias.api.serviceAccountName" . }}
       {{- if .Values.api.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.api.terminationGracePeriodSeconds }}
       {{- end }}

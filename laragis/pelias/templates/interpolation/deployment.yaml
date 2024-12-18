@@ -39,7 +39,7 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
     spec:
-      {{- include "pelias.imagePullSecrets" . | nindent 6 }}
+      {{- include "pelias.interpolation.imagePullSecrets" . | nindent 6 }}
       automountServiceAccountToken: {{ .Values.interpolation.automountServiceAccountToken }}
       {{- if .Values.interpolation.hostAliases }}
       hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.hostAliases "context" $) | nindent 8 }}
@@ -67,7 +67,7 @@ spec:
       {{- if .Values.interpolation.podSecurityContext.enabled }}
       securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.interpolation.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "pelias.serviceAccountName" . }}
+      serviceAccountName: {{ include "pelias.interpolation.serviceAccountName" . }}
       {{- if .Values.interpolation.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.interpolation.terminationGracePeriodSeconds }}
       {{- end }}

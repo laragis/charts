@@ -11,10 +11,38 @@ Return the proper Pelias image name
 {{- end -}}
 
 {{/*
-Return the proper Docker Image Registry Secret Names
+Return the proper Pelias API Docker Image Registry Secret Names
 */}}
-{{- define "pelias.imagePullSecrets" -}}
-{{- include "common.images.pullSecrets" (dict "images" (list .Values.image) "global" .Values.global) -}}
+{{- define "pelias.api.imagePullSecrets" -}}
+{{- include "common.images.pullSecrets" (dict "images" (list .Values.api.image) "global" .Values.global) -}}
+{{- end -}}
+
+{{/*
+Return the proper Pelias Interpolation Docker Image Registry Secret Names
+*/}}
+{{- define "pelias.interpolation.imagePullSecrets" -}}
+{{- include "common.images.pullSecrets" (dict "images" (list .Values.interpolation.image) "global" .Values.global) -}}
+{{- end -}}
+
+{{/*
+Return the proper Pelias Libpostal Docker Image Registry Secret Names
+*/}}
+{{- define "pelias.libpostal.imagePullSecrets" -}}
+{{- include "common.images.pullSecrets" (dict "images" (list .Values.libpostal.image) "global" .Values.global) -}}
+{{- end -}}
+
+{{/*
+Return the proper Pelias PIP Docker Image Registry Secret Names
+*/}}
+{{- define "pelias.pip.imagePullSecrets" -}}
+{{- include "common.images.pullSecrets" (dict "images" (list .Values.pip.image) "global" .Values.global) -}}
+{{- end -}}
+
+{{/*
+Return the proper Pelias Placeholder Docker Image Registry Secret Names
+*/}}
+{{- define "pelias.placeholder.imagePullSecrets" -}}
+{{- include "common.images.pullSecrets" (dict "images" (list .Values.placeholder.image) "global" .Values.global) -}}
 {{- end -}}
 
 {{/*
@@ -55,11 +83,43 @@ Return the proper Pelias Placeholder fullname
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "pelias.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create -}}
-    {{ default (include "common.names.fullname" .) .Values.serviceAccount.name }}
+{{- define "pelias.api.serviceAccountName" -}}
+{{- if .Values.api.serviceAccount.create -}}
+    {{ default (include "pelias.api.fullname" .) .Values.api.serviceAccount.name }}
 {{- else -}}
-    {{ default "default" .Values.serviceAccount.name }}
+    {{ default "default" .Values.api.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{- define "pelias.interpolation.serviceAccountName" -}}
+{{- if .Values.interpolation.serviceAccount.create -}}
+    {{ default (include "pelias.interpolation.fullname" .) .Values.interpolation.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.interpolation.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{- define "pelias.libpostal.serviceAccountName" -}}
+{{- if .Values.libpostal.serviceAccount.create -}}
+    {{ default (include "pelias.libpostal.fullname" .) .Values.libpostal.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.libpostal.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{- define "pelias.pip.serviceAccountName" -}}
+{{- if .Values.pip.serviceAccount.create -}}
+    {{ default (include "pelias.pip.fullname" .) .Values.pip.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.pip.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{- define "pelias.placeholder.serviceAccountName" -}}
+{{- if .Values.placeholder.serviceAccount.create -}}
+    {{ default (include "pelias.placeholder.fullname" .) .Values.placeholder.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.placeholder.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
 

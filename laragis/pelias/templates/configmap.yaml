@@ -39,15 +39,15 @@ data:
       },
       "acceptance-tests": {
         "endpoints": {
-          "docker": "http://pelias-api:4000/v1/"
+          "docker": "http://{{ template "pelias.api.fullname" . }}:4000/v1/"
         }
       },
       "api": {
         "services": {
-          "placeholder": { "url": "http://placeholder:4100" },
-          "pip": { "url": "http://pip:4200" },
-          "interpolation": { "url": "http://interpolation:4300" },
-          "libpostal": { "url": "http://libpostal:4400" }
+          "placeholder": { "url": "http://{{ template "pelias.placeholder.fullname" . }}:{{ .Values.placeholder.service.ports.http }}" },
+          "pip": { "url": "http://{{ template "pelias.pip.fullname" . }}:{{ .Values.pip.service.ports.http }}" },
+          "interpolation": { "url": "http://{{ template "pelias.interpolation.fullname" . }}:{{ .Values.interpolation.service.ports.http }}" },
+          "libpostal": { "url": "http://{{ template "pelias.libpostal.fullname" . }}:{{ .Values.libpostal.service.ports.http }}" }
         },
         "targets": {
           "auto_discover": true,
