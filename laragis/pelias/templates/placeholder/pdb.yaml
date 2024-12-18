@@ -1,0 +1,30 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if and .Values.placeholder.enabled .Values.placeholder.pdb.create }}
+apiVersion: {{ include "common.capabilities.policy.apiVersion" . }}
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "pelias.placeholder.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: pelias
+    app.kubernetes.io/component: placeholder
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.placeholder.pdb.minAvailable }}
+  minAvailable: {{ .Values.placeholder.pdb.minAvailable }}
+  {{- end  }}
+  {{- if or .Values.placeholder.pdb.maxUnavailable ( not .Values.placeholder.pdb.minAvailable ) }}
+  maxUnavailable: {{ .Values.placeholder.pdb.maxUnavailable | default 1 }}
+  {{- end  }}
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.placeholder.podLabels .Values.commonLabels ) "context" . ) }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/part-of: pelias
+      app.kubernetes.io/component: placeholder
+{{- end }}

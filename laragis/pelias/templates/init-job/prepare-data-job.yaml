@@ -41,7 +41,7 @@ spec:
             - |
               [ ! -d "/data/polylines" ] && bash ./docker_extract.sh || echo "Done!"
           volumeMounts:
-            - name: pelias-conf
+            - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
@@ -57,7 +57,7 @@ spec:
               ./cmd/extract.sh
               ./cmd/build.sh
           volumeMounts:
-            - name: pelias-conf
+            - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
@@ -71,7 +71,7 @@ spec:
             - |
               bash ./docker_build.sh
           volumeMounts:
-            - name: pelias-conf
+            - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
@@ -82,9 +82,9 @@ spec:
           imagePullPolicy: IfNotPresent
           command: ["sh", "-c", "echo 'Job completed!'"]
       volumes:
-        - name: pelias-conf
+        - name: configuration
           configMap:
-            name: {{ printf "%s-conf" (include "common.names.fullname" .) }}
+            name: {{ include "pelias.configMapName"  . }}
         - name: data
           {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:

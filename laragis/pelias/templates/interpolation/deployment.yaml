@@ -1,0 +1,204 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if .Values.interpolation.enabled }}
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ template "pelias.interpolation.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: pelias
+    app.kubernetes.io/component: interpolation
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" (dict "value" .Values.commonAnnotations "context" $) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.interpolation.podLabels .Values.commonLabels ) "context" . ) }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/part-of: pelias
+      app.kubernetes.io/component: interpolation
+  {{- if not .Values.interpolation.autoscaling.hpa.enabled }}
+  replicas: {{ .Values.interpolation.replicaCount }}
+  {{- end }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimitCount }}
+  {{- if .Values.interpolation.updateStrategy }}
+  strategy: {{- toYaml .Values.interpolation.updateStrategy | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      labels: {{- include "common.labels.standard" ( dict "customLabels" $podLabels "context" $ ) | nindent 8 }}
+        app.kubernetes.io/part-of: pelias
+        app.kubernetes.io/component: interpolation
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if .Values.interpolation.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.podAnnotations "context" $) | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- include "pelias.imagePullSecrets" . | nindent 6 }}
+      automountServiceAccountToken: {{ .Values.interpolation.automountServiceAccountToken }}
+      {{- if .Values.interpolation.hostAliases }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.hostAliases "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.interpolation.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.affinity "context" $) | nindent 8 }}
+      {{- else }}
+      affinity:
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.interpolation.podAffinityPreset "component" "interpolation" "customLabels" $podLabels "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.interpolation.podAntiAffinityPreset "component" "interpolation" "customLabels" $podLabels "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.interpolation.nodeAffinityPreset.type "key" .Values.interpolation.nodeAffinityPreset.key "values" .Values.interpolation.nodeAffinityPreset.values) | nindent 10 }}
+      {{- end }}
+      {{- if .Values.interpolation.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.interpolation.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.interpolation.priorityClassName }}
+      priorityClassName: {{ .Values.interpolation.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.interpolation.schedulerName }}
+      schedulerName: {{ .Values.interpolation.schedulerName }}
+      {{- end }}
+      {{- if .Values.interpolation.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.interpolation.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "pelias.serviceAccountName" . }}
+      {{- if .Values.interpolation.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.interpolation.terminationGracePeriodSeconds }}
+      {{- end }}
+      {{- if .Values.interpolation.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.topologySpreadConstraints "context" .) | nindent 8 }}
+      {{- end }}
+      initContainers:
+        {{- if .Values.initContainers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.initContainers "context" $) | trim | nindent 8 }}
+        {{- end }}
+        {{- if .Values.interpolation.initContainers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.initContainers "context" $) | trim | nindent 8 }}
+        {{- end }}
+      containers:
+        - name: pelias-interpolation
+          image: {{ include "pelias.interpolation.image" . }}
+          imagePullPolicy: {{ .Values.interpolation.image.pullPolicy }}          
+          {{- if .Values.diagnosticMode.enabled }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.command "context" $) | nindent 12 }}
+          {{- else if .Values.interpolation.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.command "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.diagnosticMode.enabled }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.args "context" $) | nindent 12 }}
+          {{- else if .Values.interpolation.args }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.args "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.interpolation.containerSecurityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.interpolation.containerSecurityContext "context" $) | nindent 12 }}
+          {{- end }}
+          env:
+            {{- if .Values.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+            {{- if .Values.interpolation.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+          {{- if or .Values.interpolation.extraEnvVarsCM .Values.interpolation.extraEnvVarsSecret .Values.interpolation.extraEnvVarsSecrets .Values.extraEnvVarsCM .Values.extraEnvVarsSecret .Values.extraEnvVarsSecrets }}
+          envFrom:
+            {{- if .Values.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ .Values.extraEnvVarsCM }}
+            {{- end }}
+            {{- if .Values.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ .Values.extraEnvVarsSecret }}
+            {{- end }}
+            {{- if .Values.interpolation.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ .Values.interpolation.extraEnvVarsCM }}
+            {{- end }}
+            {{- if .Values.interpolation.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ .Values.interpolation.extraEnvVarsSecret }}
+            {{- end }}
+            {{- if .Values.extraEnvVarsSecrets }}
+            {{- range .Values.extraEnvVarsSecrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.interpolation.extraEnvVarsSecrets }}
+            {{- range .Values.interpolation.extraEnvVarsSecrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+            {{- end }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.interpolation.containerPorts.http }}
+          {{- if not .Values.diagnosticMode.enabled }}
+          {{- if .Values.interpolation.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.interpolation.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.interpolation.startupProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: http
+          {{- end }}
+          {{- if .Values.interpolation.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.interpolation.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.interpolation.livenessProbe "enabled") "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.interpolation.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.interpolation.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.interpolation.readinessProbe "enabled") "context" $) | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.interpolation.lifecycleHooks }}
+          lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.lifecycleHooks "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.interpolation.resources }}
+          resources: {{- toYaml .Values.interpolation.resources | nindent 12 }}
+          {{- else if ne .Values.interpolation.resourcesPreset "none" }}
+          resources: {{- include "common.resources.preset" (dict "type" .Values.interpolation.resourcesPreset) | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: configuration
+              mountPath: /code/pelias.json
+              subPath: pelias.json
+            - name: data
+              mountPath: /data
+            {{- if .Values.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
+            {{- if .Values.interpolation.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
+        {{- if .Values.sidecars }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.sidecars "context" $) | trim | nindent 8 }}
+        {{- end }}
+        {{- if .Values.interpolation.sidecars }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.sidecars "context" $) | trim | nindent 8 }}
+        {{- end }}
+      volumes:
+        - name: configuration
+          configMap:
+            name: {{ include "pelias.configMapName"  . }}
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "common.names.fullname" .) }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        {{- if .Values.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
+        {{- if .Values.interpolation.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}   
+{{- end }}

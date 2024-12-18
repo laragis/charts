@@ -1,0 +1,204 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if .Values.pip.enabled }}
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ template "pelias.pip.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: pelias
+    app.kubernetes.io/component: pip
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" (dict "value" .Values.commonAnnotations "context" $) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.pip.podLabels .Values.commonLabels ) "context" . ) }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/part-of: pelias
+      app.kubernetes.io/component: pip
+  {{- if not .Values.pip.autoscaling.hpa.enabled }}
+  replicas: {{ .Values.pip.replicaCount }}
+  {{- end }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimitCount }}
+  {{- if .Values.pip.updateStrategy }}
+  strategy: {{- toYaml .Values.pip.updateStrategy | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      labels: {{- include "common.labels.standard" ( dict "customLabels" $podLabels "context" $ ) | nindent 8 }}
+        app.kubernetes.io/part-of: pelias
+        app.kubernetes.io/component: pip
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if .Values.pip.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.pip.podAnnotations "context" $) | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- include "pelias.imagePullSecrets" . | nindent 6 }}
+      automountServiceAccountToken: {{ .Values.pip.automountServiceAccountToken }}
+      {{- if .Values.pip.hostAliases }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.pip.hostAliases "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.pip.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.pip.affinity "context" $) | nindent 8 }}
+      {{- else }}
+      affinity:
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.pip.podAffinityPreset "component" "pip" "customLabels" $podLabels "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.pip.podAntiAffinityPreset "component" "pip" "customLabels" $podLabels "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.pip.nodeAffinityPreset.type "key" .Values.pip.nodeAffinityPreset.key "values" .Values.pip.nodeAffinityPreset.values) | nindent 10 }}
+      {{- end }}
+      {{- if .Values.pip.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.pip.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.pip.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.pip.tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.pip.priorityClassName }}
+      priorityClassName: {{ .Values.pip.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.pip.schedulerName }}
+      schedulerName: {{ .Values.pip.schedulerName }}
+      {{- end }}
+      {{- if .Values.pip.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.pip.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "pelias.serviceAccountName" . }}
+      {{- if .Values.pip.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.pip.terminationGracePeriodSeconds }}
+      {{- end }}
+      {{- if .Values.pip.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.pip.topologySpreadConstraints "context" .) | nindent 8 }}
+      {{- end }}
+      initContainers:
+        {{- if .Values.initContainers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.initContainers "context" $) | trim | nindent 8 }}
+        {{- end }}
+        {{- if .Values.pip.initContainers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.pip.initContainers "context" $) | trim | nindent 8 }}
+        {{- end }}
+      containers:
+        - name: pelias-pip
+          image: {{ include "pelias.pip.image" . }}
+          imagePullPolicy: {{ .Values.pip.image.pullPolicy }}          
+          {{- if .Values.diagnosticMode.enabled }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.command "context" $) | nindent 12 }}
+          {{- else if .Values.pip.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.pip.command "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.diagnosticMode.enabled }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.args "context" $) | nindent 12 }}
+          {{- else if .Values.pip.args }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.pip.args "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.pip.containerSecurityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.pip.containerSecurityContext "context" $) | nindent 12 }}
+          {{- end }}
+          env:
+            {{- if .Values.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+            {{- if .Values.pip.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.pip.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+          {{- if or .Values.pip.extraEnvVarsCM .Values.pip.extraEnvVarsSecret .Values.pip.extraEnvVarsSecrets .Values.extraEnvVarsCM .Values.extraEnvVarsSecret .Values.extraEnvVarsSecrets }}
+          envFrom:
+            {{- if .Values.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ .Values.extraEnvVarsCM }}
+            {{- end }}
+            {{- if .Values.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ .Values.extraEnvVarsSecret }}
+            {{- end }}
+            {{- if .Values.pip.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ .Values.pip.extraEnvVarsCM }}
+            {{- end }}
+            {{- if .Values.pip.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ .Values.pip.extraEnvVarsSecret }}
+            {{- end }}
+            {{- if .Values.extraEnvVarsSecrets }}
+            {{- range .Values.extraEnvVarsSecrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.pip.extraEnvVarsSecrets }}
+            {{- range .Values.pip.extraEnvVarsSecrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+            {{- end }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.pip.containerPorts.http }}
+          {{- if not .Values.diagnosticMode.enabled }}
+          {{- if .Values.pip.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.pip.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.pip.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.pip.startupProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: http
+          {{- end }}
+          {{- if .Values.pip.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.pip.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.pip.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.pip.livenessProbe "enabled") "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.pip.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.pip.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.pip.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.pip.readinessProbe "enabled") "context" $) | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.pip.lifecycleHooks }}
+          lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.pip.lifecycleHooks "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.pip.resources }}
+          resources: {{- toYaml .Values.pip.resources | nindent 12 }}
+          {{- else if ne .Values.pip.resourcesPreset "none" }}
+          resources: {{- include "common.resources.preset" (dict "type" .Values.pip.resourcesPreset) | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: configuration
+              mountPath: /code/pelias.json
+              subPath: pelias.json
+            - name: data
+              mountPath: /data
+            {{- if .Values.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
+            {{- if .Values.pip.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.pip.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
+        {{- if .Values.sidecars }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.sidecars "context" $) | trim | nindent 8 }}
+        {{- end }}
+        {{- if .Values.pip.sidecars }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.pip.sidecars "context" $) | trim | nindent 8 }}
+        {{- end }}
+      volumes:
+        - name: configuration
+          configMap:
+            name: {{ include "pelias.configMapName"  . }}
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "common.names.fullname" .) }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        {{- if .Values.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
+        {{- if .Values.pip.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.pip.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}   
+{{- end }}

@@ -3,10 +3,11 @@ Copyright Broadcom, Inc. All Rights Reserved.
 SPDX-License-Identifier: APACHE-2.0
 */}}
 
+{{- if not .Values.existingConfigmap }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ printf "%s-conf" (include "common.names.fullname" .) }}
+  name: {{ include "common.names.fullname" . }}
   namespace: {{ include "common.names.namespace" . | quote }}
   labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
     app.kubernetes.io/part-of: pelias
@@ -14,7 +15,10 @@ metadata:
   annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
   {{- end }}
 data:
-  pelias.json: |
+  pelias.json: |-
+    {{- if .Values.configuration }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.configuration "context" .) }}
+    {{- else }}
     {
       "logger": {
         "level": "info",
@@ -100,3 +104,5 @@ data:
         }
       }
     }
+    {{- end }}    
+{{- end }}

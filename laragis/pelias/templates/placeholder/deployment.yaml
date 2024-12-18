@@ -1,0 +1,204 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if .Values.placeholder.enabled }}
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ template "pelias.placeholder.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: pelias
+    app.kubernetes.io/component: placeholder
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" (dict "value" .Values.commonAnnotations "context" $) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.placeholder.podLabels .Values.commonLabels ) "context" . ) }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/part-of: pelias
+      app.kubernetes.io/component: placeholder
+  {{- if not .Values.placeholder.autoscaling.hpa.enabled }}
+  replicas: {{ .Values.placeholder.replicaCount }}
+  {{- end }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimitCount }}
+  {{- if .Values.placeholder.updateStrategy }}
+  strategy: {{- toYaml .Values.placeholder.updateStrategy | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      labels: {{- include "common.labels.standard" ( dict "customLabels" $podLabels "context" $ ) | nindent 8 }}
+        app.kubernetes.io/part-of: pelias
+        app.kubernetes.io/component: placeholder
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if .Values.placeholder.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.placeholder.podAnnotations "context" $) | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- include "pelias.imagePullSecrets" . | nindent 6 }}
+      automountServiceAccountToken: {{ .Values.placeholder.automountServiceAccountToken }}
+      {{- if .Values.placeholder.hostAliases }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.placeholder.hostAliases "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.placeholder.affinity }}
+      affinity: {{- include "common.tplvalues.render" (dict "value" .Values.placeholder.affinity "context" $) | nindent 8 }}
+      {{- else }}
+      affinity:
+        podAffinity: {{- include "common.affinities.pods" (dict "type" .Values.placeholder.podAffinityPreset "component" "placeholder" "customLabels" $podLabels "context" $) | nindent 10 }}
+        podAntiAffinity: {{- include "common.affinities.pods" (dict "type" .Values.placeholder.podAntiAffinityPreset "component" "placeholder" "customLabels" $podLabels "context" $) | nindent 10 }}
+        nodeAffinity: {{- include "common.affinities.nodes" (dict "type" .Values.placeholder.nodeAffinityPreset.type "key" .Values.placeholder.nodeAffinityPreset.key "values" .Values.placeholder.nodeAffinityPreset.values) | nindent 10 }}
+      {{- end }}
+      {{- if .Values.placeholder.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.placeholder.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.placeholder.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.placeholder.tolerations "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.placeholder.priorityClassName }}
+      priorityClassName: {{ .Values.placeholder.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.placeholder.schedulerName }}
+      schedulerName: {{ .Values.placeholder.schedulerName }}
+      {{- end }}
+      {{- if .Values.placeholder.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.placeholder.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "pelias.serviceAccountName" . }}
+      {{- if .Values.placeholder.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.placeholder.terminationGracePeriodSeconds }}
+      {{- end }}
+      {{- if .Values.placeholder.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.placeholder.topologySpreadConstraints "context" .) | nindent 8 }}
+      {{- end }}
+      initContainers:
+        {{- if .Values.initContainers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.initContainers "context" $) | trim | nindent 8 }}
+        {{- end }}
+        {{- if .Values.placeholder.initContainers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.placeholder.initContainers "context" $) | trim | nindent 8 }}
+        {{- end }}
+      containers:
+        - name: pelias-placeholder
+          image: {{ include "pelias.placeholder.image" . }}
+          imagePullPolicy: {{ .Values.placeholder.image.pullPolicy }}          
+          {{- if .Values.diagnosticMode.enabled }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.command "context" $) | nindent 12 }}
+          {{- else if .Values.placeholder.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.placeholder.command "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.diagnosticMode.enabled }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.args "context" $) | nindent 12 }}
+          {{- else if .Values.placeholder.args }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.placeholder.args "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.placeholder.containerSecurityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.placeholder.containerSecurityContext "context" $) | nindent 12 }}
+          {{- end }}
+          env:
+            {{- if .Values.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+            {{- if .Values.placeholder.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.placeholder.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+          {{- if or .Values.placeholder.extraEnvVarsCM .Values.placeholder.extraEnvVarsSecret .Values.placeholder.extraEnvVarsSecrets .Values.extraEnvVarsCM .Values.extraEnvVarsSecret .Values.extraEnvVarsSecrets }}
+          envFrom:
+            {{- if .Values.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ .Values.extraEnvVarsCM }}
+            {{- end }}
+            {{- if .Values.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ .Values.extraEnvVarsSecret }}
+            {{- end }}
+            {{- if .Values.placeholder.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ .Values.placeholder.extraEnvVarsCM }}
+            {{- end }}
+            {{- if .Values.placeholder.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ .Values.placeholder.extraEnvVarsSecret }}
+            {{- end }}
+            {{- if .Values.extraEnvVarsSecrets }}
+            {{- range .Values.extraEnvVarsSecrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.placeholder.extraEnvVarsSecrets }}
+            {{- range .Values.placeholder.extraEnvVarsSecrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+            {{- end }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.placeholder.containerPorts.http }}
+          {{- if not .Values.diagnosticMode.enabled }}
+          {{- if .Values.placeholder.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.placeholder.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.placeholder.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.placeholder.startupProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: http
+          {{- end }}
+          {{- if .Values.placeholder.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.placeholder.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.placeholder.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.placeholder.livenessProbe "enabled") "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.placeholder.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.placeholder.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.placeholder.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.placeholder.readinessProbe "enabled") "context" $) | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.placeholder.lifecycleHooks }}
+          lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.placeholder.lifecycleHooks "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.placeholder.resources }}
+          resources: {{- toYaml .Values.placeholder.resources | nindent 12 }}
+          {{- else if ne .Values.placeholder.resourcesPreset "none" }}
+          resources: {{- include "common.resources.preset" (dict "type" .Values.placeholder.resourcesPreset) | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: configuration
+              mountPath: /code/pelias.json
+              subPath: pelias.json
+            - name: data
+              mountPath: /data
+            {{- if .Values.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
+            {{- if .Values.placeholder.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.placeholder.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
+        {{- if .Values.sidecars }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.sidecars "context" $) | trim | nindent 8 }}
+        {{- end }}
+        {{- if .Values.placeholder.sidecars }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.placeholder.sidecars "context" $) | trim | nindent 8 }}
+        {{- end }}
+      volumes:
+        - name: configuration
+          configMap:
+            name: {{ include "pelias.configMapName"  . }}
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "common.names.fullname" .) }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        {{- if .Values.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
+        {{- if .Values.placeholder.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.placeholder.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}   
+{{- end }}

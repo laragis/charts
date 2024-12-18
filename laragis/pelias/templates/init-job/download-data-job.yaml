@@ -41,7 +41,7 @@ spec:
             - |
               [ ! -d "/data/whosonfirst" ] && ./bin/download || echo "Done!"
           volumeMounts:
-            - name: pelias-conf
+            - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
@@ -55,7 +55,7 @@ spec:
             - |
               [ ! -d "/data/openaddresses" ] && ./bin/download || echo "Done!"
           volumeMounts:
-            - name: pelias-conf
+            - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
@@ -69,7 +69,7 @@ spec:
             - |
               [ ! -d "/data/openstreetmap" ] && ./bin/download || echo "Done!"
           volumeMounts:
-            - name: pelias-conf
+            - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
@@ -83,7 +83,7 @@ spec:
             - |
               [ ! -d "/data/geonames" ] && ./bin/download || echo "Done!"
           volumeMounts:
-            - name: pelias-conf
+            - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
@@ -97,7 +97,7 @@ spec:
             - |
               [ ! -d "/data/interpolation" ] && ./bin/download-tiger || echo "Done!"
           volumeMounts:
-            - name: pelias-conf
+            - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
@@ -111,7 +111,7 @@ spec:
             - |
               [ ! -d "/data/transit" ] && ./bin/download || echo "Done!"
           volumeMounts:
-            - name: pelias-conf
+            - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
@@ -125,15 +125,15 @@ spec:
             - |
               [ ! -d "/data/csv" ] && ./bin/download || echo "Done!"
           volumeMounts:
-            - name: pelias-conf
+            - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
               mountPath: /data
       volumes:
-        - name: pelias-conf
+        - name: configuration
           configMap:
-            name: {{ printf "%s-conf" (include "common.names.fullname" .) }}
+            name: {{ include "pelias.configMapName"  . }}
         - name: data
           {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:

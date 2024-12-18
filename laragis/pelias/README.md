@@ -7,9 +7,9 @@
 ElasticSearch
 
 ```shell
-helm dependency update ../elasticsearch/17.9.29 --skip-refresh
+helm dependency update ../../bitnami/elasticsearch/17.9.29 --skip-refresh
 helm install pelias-elasticsearch \
-  ../elasticsearch/17.9.29 \
+  ../../bitnami/elasticsearch/17.9.29 \
   --namespace gtelmaps \
   -f ./values-elasticsearch.yaml
 ```

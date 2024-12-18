@@ -70,17 +70,17 @@ spec:
               
               echo "Done!"
           volumeMounts:
-            - name: pelias-conf
+            - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
-            {{- if and $.Values.persistence.enabled }}
+            {{- if .Values.persistence.enabled }}
             - name: data
               mountPath: /data
             {{- end }}
       volumes:
-        - name: pelias-conf
+        - name: configuration
           configMap:
-            name: {{ printf "%s-conf" (include "common.names.fullname" .) }}
+            name: {{ include "pelias.configMapName"  . }}
         - name: data
           {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:

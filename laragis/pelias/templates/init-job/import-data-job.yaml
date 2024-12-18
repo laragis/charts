@@ -41,7 +41,7 @@ spec:
             - |
               ./bin/start
           volumeMounts:
-            - name: pelias-conf
+            - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
@@ -55,7 +55,7 @@ spec:
             - |
               ./bin/parallel ${OPENADDRESSES_PARALLELISM:-1}
           volumeMounts:
-            - name: pelias-conf
+            - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
@@ -69,7 +69,7 @@ spec:
             - |
               ./bin/start
           volumeMounts:
-            - name: pelias-conf
+            - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
@@ -83,7 +83,7 @@ spec:
             - |
               ./bin/start
           volumeMounts:
-            - name: pelias-conf
+            - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
@@ -97,7 +97,7 @@ spec:
             - |
               ./bin/start
           volumeMounts:
-            - name: pelias-conf
+            - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
@@ -111,7 +111,7 @@ spec:
             - |
               ./bin/start
           volumeMounts:
-            - name: pelias-conf
+            - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
@@ -125,7 +125,7 @@ spec:
             - |
               ./bin/parallel ${CSV_PARALLELISM:-1}
           volumeMounts:
-            - name: pelias-conf
+            - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
             - name: data
@@ -136,9 +136,9 @@ spec:
           imagePullPolicy: IfNotPresent
           command: ["sh", "-c", "echo 'Job completed!'"]
       volumes:
-        - name: pelias-conf
+        - name: configuration
           configMap:
-            name: {{ printf "%s-conf" (include "common.names.fullname" .) }}
+            name: {{ include "pelias.configMapName"  . }}
         - name: data
           {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
