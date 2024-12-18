@@ -34,7 +34,6 @@ spec:
         app.kubernetes.io/part-of: pelias
         app.kubernetes.io/component: libpostal
       annotations:
-        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         {{- if .Values.libpostal.podAnnotations }}
         {{- include "common.tplvalues.render" (dict "value" .Values.libpostal.podAnnotations "context" $) | nindent 8 }}
         {{- end }}
@@ -151,11 +150,16 @@ spec:
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.libpostal.customLivenessProbe "context" $) | nindent 12 }}
           {{- else if .Values.libpostal.livenessProbe.enabled }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.libpostal.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /parse?address=47A Phạm Viết Chánh, Phường Nguyễn Cư Trinh, Quận 1, Thành phố Hồ Chí Minh, Việt Nam
+              port: http
           {{- end }}
           {{- if .Values.libpostal.customReadinessProbe }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.libpostal.customReadinessProbe "context" $) | nindent 12 }}
           {{- else if .Values.libpostal.readinessProbe.enabled }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.libpostal.readinessProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: http
           {{- end }}
           {{- end }}
           {{- if .Values.libpostal.lifecycleHooks }}
@@ -167,11 +171,6 @@ spec:
           resources: {{- include "common.resources.preset" (dict "type" .Values.libpostal.resourcesPreset) | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - name: configuration
-              mountPath: /code/pelias.json
-              subPath: pelias.json
-            - name: data
-              mountPath: /data
             {{- if .Values.extraVolumeMounts }}
             {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumeMounts "context" $) | nindent 12 }}
             {{- end }}
@@ -185,16 +184,6 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.libpostal.sidecars "context" $) | trim | nindent 8 }}
         {{- end }}
       volumes:
-        - name: configuration
-          configMap:
-            name: {{ include "pelias.configMapName"  . }}
-        - name: data
-          {{- if .Values.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "common.names.fullname" .) }}
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
         {{- if .Values.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
         {{- end }}

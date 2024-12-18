@@ -4,11 +4,40 @@ SPDX-License-Identifier: APACHE-2.0
 */}}
 
 {{/*
-Return the proper Pelias image name
+Return the proper Pelias API image name
 */}}
-{{- define "pelias.image" -}}
-{{- include "common.images.image" (dict "imageRoot" .Values.image "global" .Values.global) -}}
+{{- define "pelias.api.image" -}}
+{{- include "common.images.image" (dict "imageRoot" .Values.api.image "global" .Values.global) -}}
 {{- end -}}
+
+{{/*
+Return the proper Pelias Interpolation image name
+*/}}
+{{- define "pelias.interpolation.image" -}}
+{{- include "common.images.image" (dict "imageRoot" .Values.interpolation.image "global" .Values.global) -}}
+{{- end -}}
+
+{{/*
+Return the proper Pelias Libpostal image name
+*/}}
+{{- define "pelias.libpostal.image" -}}
+{{- include "common.images.image" (dict "imageRoot" .Values.libpostal.image "global" .Values.global) -}}
+{{- end -}}
+
+{{/*
+Return the proper Pelias PIP image name
+*/}}
+{{- define "pelias.pip.image" -}}
+{{- include "common.images.image" (dict "imageRoot" .Values.pip.image "global" .Values.global) -}}
+{{- end -}}
+
+{{/*
+Return the proper Pelias Placeholder image name
+*/}}
+{{- define "pelias.placeholder.image" -}}
+{{- include "common.images.image" (dict "imageRoot" .Values.placeholder.image "global" .Values.global) -}}
+{{- end -}}
+
 
 {{/*
 Return the proper Pelias API Docker Image Registry Secret Names
@@ -121,34 +150,6 @@ Create the name of the service account to use
 {{- else -}}
     {{ default "default" .Values.placeholder.serviceAccount.name }}
 {{- end -}}
-{{- end -}}
-
-{{/*
-Return the proper Pelias Interpolation image name
-*/}}
-{{- define "pelias.interpolation.image" -}}
-{{- include "common.images.image" (dict "imageRoot" .Values.interpolation.image "global" .Values.global) -}}
-{{- end -}}
-
-{{/*
-Return the proper Pelias Libpostal image name
-*/}}
-{{- define "pelias.libpostal.image" -}}
-{{- include "common.images.image" (dict "imageRoot" .Values.libpostal.image "global" .Values.global) -}}
-{{- end -}}
-
-{{/*
-Return the proper Pelias PIP image name
-*/}}
-{{- define "pelias.pip.image" -}}
-{{- include "common.images.image" (dict "imageRoot" .Values.pip.image "global" .Values.global) -}}
-{{- end -}}
-
-{{/*
-Return the proper Pelias Placeholder image name
-*/}}
-{{- define "pelias.placeholder.image" -}}
-{{- include "common.images.image" (dict "imageRoot" .Values.placeholder.image "global" .Values.global) -}}
 {{- end -}}
 
 {{/*

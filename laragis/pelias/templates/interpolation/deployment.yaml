@@ -151,11 +151,17 @@ spec:
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.customLivenessProbe "context" $) | nindent 12 }}
           {{- else if .Values.interpolation.livenessProbe.enabled }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.interpolation.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /
+              port: http
           {{- end }}
           {{- if .Values.interpolation.customReadinessProbe }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.customReadinessProbe "context" $) | nindent 12 }}
           {{- else if .Values.interpolation.readinessProbe.enabled }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.interpolation.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /
+              port: http
           {{- end }}
           {{- end }}
           {{- if .Values.interpolation.lifecycleHooks }}

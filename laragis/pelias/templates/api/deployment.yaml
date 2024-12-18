@@ -150,11 +150,17 @@ spec:
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.api.customLivenessProbe "context" $) | nindent 12 }}
           {{- else if .Values.api.livenessProbe.enabled }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.api.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /
+              port: http
           {{- end }}
           {{- if .Values.api.customReadinessProbe }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.api.customReadinessProbe "context" $) | nindent 12 }}
           {{- else if .Values.api.readinessProbe.enabled }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.api.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /
+              port: http
           {{- end }}
           {{- end }}
           {{- if .Values.api.lifecycleHooks }}
@@ -169,8 +175,6 @@ spec:
             - name: configuration
               mountPath: /code/pelias.json
               subPath: pelias.json
-            - name: data
-              mountPath: /data
             {{- if .Values.extraVolumeMounts }}
             {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumeMounts "context" $) | nindent 12 }}
             {{- end }}
@@ -187,13 +191,6 @@ spec:
         - name: configuration
           configMap:
             name: {{ include "pelias.configMapName"  . }}
-        - name: data
-          {{- if .Values.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "common.names.fullname" .) }}
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
         {{- if .Values.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
         {{- end }}

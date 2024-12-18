@@ -334,7 +334,7 @@ api:
   ## @param api.containerPorts.http API HTTP container port
   ##
   containerPorts:
-    http: 80
+    http: 3100
   ## @param api.lifecycleHooks for API containers to automate configuration before or after startup
   ##
   lifecycleHooks: {}
@@ -349,10 +349,10 @@ api:
   ##
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 180
-    periodSeconds: 20
+    initialDelaySeconds: 5
+    periodSeconds: 10
     timeoutSeconds: 5
-    failureThreshold: 6
+    failureThreshold: 5
     successThreshold: 1
   ## @param api.readinessProbe.enabled Enable readinessProbe on API containers
   ## @param api.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
@@ -363,10 +363,10 @@ api:
   ##
   readinessProbe:
     enabled: true
-    initialDelaySeconds: 30
+    initialDelaySeconds: 5
     periodSeconds: 10
     timeoutSeconds: 5
-    failureThreshold: 6
+    failureThreshold: 5
     successThreshold: 1
   ## @param api.startupProbe.enabled Enable startupProbe on API containers
   ## @param api.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
@@ -377,10 +377,10 @@ api:
   ##
   startupProbe:
     enabled: false
-    initialDelaySeconds: 60
+    initialDelaySeconds: 5
     periodSeconds: 10
-    timeoutSeconds: 1
-    failureThreshold: 15
+    timeoutSeconds: 5
+    failureThreshold: 5
     successThreshold: 1
   ## @param api.customLivenessProbe Custom livenessProbe that overrides the default one
   ##
@@ -524,7 +524,7 @@ api:
     ## @param api.service.ports.http API service HTTP port
     ##
     ports:
-      http: 80
+      http: 8080
     ## Node ports to expose
     ## @param api.service.nodePorts.http Node port for HTTP
     ## @param api.service.nodePorts.https Node port for HTTPS
@@ -848,10 +848,10 @@ interpolation:
   ##
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 180
-    periodSeconds: 20
+    initialDelaySeconds: 5
+    periodSeconds: 10
     timeoutSeconds: 5
-    failureThreshold: 6
+    failureThreshold: 5
     successThreshold: 1
   ## @param interpolation.readinessProbe.enabled Enable readinessProbe on Interpolation containers
   ## @param interpolation.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
@@ -862,10 +862,10 @@ interpolation:
   ##
   readinessProbe:
     enabled: true
-    initialDelaySeconds: 30
+    initialDelaySeconds: 5
     periodSeconds: 10
     timeoutSeconds: 5
-    failureThreshold: 6
+    failureThreshold: 5
     successThreshold: 1
   ## @param interpolation.startupProbe.enabled Enable startupProbe on Interpolation containers
   ## @param interpolation.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
@@ -876,10 +876,10 @@ interpolation:
   ##
   startupProbe:
     enabled: false
-    initialDelaySeconds: 60
+    initialDelaySeconds: 5
     periodSeconds: 10
-    timeoutSeconds: 1
-    failureThreshold: 15
+    timeoutSeconds: 5
+    failureThreshold: 5
     successThreshold: 1
   ## @param interpolation.customLivenessProbe Custom livenessProbe that overrides the default one
   ##
@@ -895,7 +895,7 @@ interpolation:
   ## @param interpolation.resourcesPreset Set Interpolation container resources according to one common preset (allowed values: none, nano, small, medium, large, xlarge, 2xlarge). This is ignored if placeholder.resources is set (placeholder.resources is recommended for production).
   ## More information: https://github.com/bitnami/charts/blob/main/bitnami/common/templates/_resources.tpl#L15
   ##
-  resourcesPreset: "medium"
+  resourcesPreset: "xlarge"
   ## @param interpolation.resources Set Interpolation container requests and limits for different resources like CPU or memory (essential for production workloads)
   ## Example:
   ## resources:
@@ -1023,7 +1023,7 @@ interpolation:
     ## @param interpolation.service.ports.http Interpolation service HTTP port    
     ##
     ports:
-      http: 80
+      http: 8080
     ## Node ports to expose
     ## @param interpolation.service.nodePorts.http Node port for HTTP
     ## @param interpolation.service.nodePorts.https Node port for HTTPS
@@ -1347,10 +1347,10 @@ libpostal:
   ##
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 180
-    periodSeconds: 20
+    initialDelaySeconds: 5
+    periodSeconds: 10
     timeoutSeconds: 5
-    failureThreshold: 6
+    failureThreshold: 5
     successThreshold: 1
   ## @param libpostal.readinessProbe.enabled Enable readinessProbe on Libpostal containers
   ## @param libpostal.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
@@ -1361,10 +1361,10 @@ libpostal:
   ##
   readinessProbe:
     enabled: true
-    initialDelaySeconds: 30
+    initialDelaySeconds: 5
     periodSeconds: 10
     timeoutSeconds: 5
-    failureThreshold: 6
+    failureThreshold: 5
     successThreshold: 1
   ## @param libpostal.startupProbe.enabled Enable startupProbe on Libpostal containers
   ## @param libpostal.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
@@ -1375,10 +1375,10 @@ libpostal:
   ##
   startupProbe:
     enabled: false
-    initialDelaySeconds: 60
+    initialDelaySeconds: 5
     periodSeconds: 10
-    timeoutSeconds: 1
-    failureThreshold: 15
+    timeoutSeconds: 5
+    failureThreshold: 5
     successThreshold: 1
   ## @param libpostal.customLivenessProbe Custom livenessProbe that overrides the default one
   ##
@@ -1394,7 +1394,7 @@ libpostal:
   ## @param libpostal.resourcesPreset Set Libpostal container resources according to one common preset (allowed values: none, nano, small, medium, large, xlarge, 2xlarge). This is ignored if placeholder.resources is set (placeholder.resources is recommended for production).
   ## More information: https://github.com/bitnami/charts/blob/main/bitnami/common/templates/_resources.tpl#L15
   ##
-  resourcesPreset: "medium"
+  resourcesPreset: "xlarge"
   ## @param libpostal.resources Set Libpostal container requests and limits for different resources like CPU or memory (essential for production workloads)
   ## Example:
   ## resources:
@@ -1846,10 +1846,10 @@ pip:
   ##
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 180
-    periodSeconds: 20
+    initialDelaySeconds: 5
+    periodSeconds: 10
     timeoutSeconds: 5
-    failureThreshold: 6
+    failureThreshold: 5
     successThreshold: 1
   ## @param pip.readinessProbe.enabled Enable readinessProbe on PIP containers
   ## @param pip.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
@@ -1860,10 +1860,10 @@ pip:
   ##
   readinessProbe:
     enabled: true
-    initialDelaySeconds: 30
+    initialDelaySeconds: 5
     periodSeconds: 10
     timeoutSeconds: 5
-    failureThreshold: 6
+    failureThreshold: 5
     successThreshold: 1
   ## @param pip.startupProbe.enabled Enable startupProbe on PIP containers
   ## @param pip.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
@@ -1874,10 +1874,10 @@ pip:
   ##
   startupProbe:
     enabled: false
-    initialDelaySeconds: 60
+    initialDelaySeconds: 5
     periodSeconds: 10
-    timeoutSeconds: 1
-    failureThreshold: 15
+    timeoutSeconds: 5
+    failureThreshold: 5
     successThreshold: 1
   ## @param pip.customLivenessProbe Custom livenessProbe that overrides the default one
   ##
@@ -2345,10 +2345,10 @@ placeholder:
   ##
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 180
-    periodSeconds: 20
+    initialDelaySeconds: 5
+    periodSeconds: 10
     timeoutSeconds: 5
-    failureThreshold: 6
+    failureThreshold: 5
     successThreshold: 1
   ## @param placeholder.readinessProbe.enabled Enable readinessProbe on Placeholder containers
   ## @param placeholder.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
@@ -2359,10 +2359,10 @@ placeholder:
   ##
   readinessProbe:
     enabled: true
-    initialDelaySeconds: 30
+    initialDelaySeconds: 5
     periodSeconds: 10
     timeoutSeconds: 5
-    failureThreshold: 6
+    failureThreshold: 5
     successThreshold: 1
   ## @param placeholder.startupProbe.enabled Enable startupProbe on Placeholder containers
   ## @param placeholder.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
@@ -2373,10 +2373,10 @@ placeholder:
   ##
   startupProbe:
     enabled: false
-    initialDelaySeconds: 60
+    initialDelaySeconds: 5
     periodSeconds: 10
-    timeoutSeconds: 1
-    failureThreshold: 15
+    timeoutSeconds: 5
+    failureThreshold: 5
     successThreshold: 1
   ## @param placeholder.customLivenessProbe Custom livenessProbe that overrides the default one
   ##
