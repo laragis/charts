@@ -9,7 +9,21 @@ initJob:
   prepareData:
     enabled: false
   importData:
-    enabled: false
+    enabled: true
+    whosonfirst:
+      enabled: false
+    openaddresses:
+      enabled: false
+    openstreetmap:
+      enabled: false
+    polylines:
+      enabled: false
+    geonames:
+      enabled: false
+    transit:
+      enabled: false
+    csv:
+      enabled: false
 
   cleanupAfterFinished:
     enabled: true

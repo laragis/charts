@@ -32,6 +32,7 @@ spec:
       securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.initJob.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
       initContainers:
+        {{- if .Values.initJob.importData.whosonfirst.enabled }}
         - name: import-whosonfirst
           image: pelias/whosonfirst:master
           imagePullPolicy: IfNotPresent
@@ -46,6 +47,8 @@ spec:
               subPath: pelias.json
             - name: data
               mountPath: /data
+        {{- end }}
+        {{- if .Values.initJob.importData.openaddresses.enabled }}
         - name: import-openaddresses
           image: pelias/openaddresses:master
           imagePullPolicy: IfNotPresent
@@ -60,6 +63,8 @@ spec:
               subPath: pelias.json
             - name: data
               mountPath: /data
+        {{- end }}
+        {{- if .Values.initJob.importData.openstreetmap.enabled }}
         - name: import-openstreetmap
           image: pelias/openstreetmap:master
           imagePullPolicy: IfNotPresent
@@ -74,6 +79,8 @@ spec:
               subPath: pelias.json
             - name: data
               mountPath: /data
+        {{- end }}
+        {{- if .Values.initJob.importData.polylines.enabled }}
         - name: import-polylines
           image: pelias/polylines:master
           imagePullPolicy: IfNotPresent
@@ -88,6 +95,8 @@ spec:
               subPath: pelias.json
             - name: data
               mountPath: /data
+        {{- end }}
+        {{- if .Values.initJob.importData.geonames.enabled }}
         - name: import-geonames
           image: pelias/geonames:master
           imagePullPolicy: IfNotPresent
@@ -102,6 +111,8 @@ spec:
               subPath: pelias.json
             - name: data
               mountPath: /data
+        {{- end }}
+        {{- if .Values.initJob.importData.transit.enabled }}
         - name: import-transit
           image: pelias/transit:master
           imagePullPolicy: IfNotPresent
@@ -116,6 +127,8 @@ spec:
               subPath: pelias.json
             - name: data
               mountPath: /data
+        {{- end }}
+        {{- if .Values.initJob.importData.csv.enabled }}
         - name: import-csv
           image: pelias/csv-importer:master
           imagePullPolicy: IfNotPresent
@@ -130,6 +143,7 @@ spec:
               subPath: pelias.json
             - name: data
               mountPath: /data
+          {{- end }}
       containers:
         - name: import-final
           image: busybox

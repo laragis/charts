@@ -129,10 +129,29 @@ initJob:
   ## @param initJob.prepareData.enabled
   prepareData:
     enabled: false
-  ## @param initJob.prepareData
-  ## @param initJob.prepareData.enabled
+  ## @param initJob.importData.enabled
+  ## @param initJob.importData.whosonfirst.enabled
+  ## @param initJob.importData.openaddresses.enabled
+  ## @param initJob.importData.openstreetmap.enabled
+  ## @param initJob.importData.geonames.enabled
+  ## @param initJob.importData.transit.enabled
+  ## @param initJob.importData.csv.enabled
   importData:
-    enabled: false
+    enabled: true
+    whosonfirst:
+      enabled: true
+    openaddresses:
+      enabled: true
+    openstreetmap:
+      enabled: true
+    polylines:
+      enabled: true
+    geonames:
+      enabled: true
+    transit:
+      enabled: true
+    csv:
+      enabled: true
   ## @param initJob.backoffLimit set backoff limit of the job
   ##
   backoffLimit: 10

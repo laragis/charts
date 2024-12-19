@@ -95,7 +95,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-              [ ! -f "/data/tmp/download_interpolation.lock" ] && ./bin/download && install -D /dev/null /data/tmp/download_interpolation.lock || echo "Done!"
+              [ ! -f "/data/tmp/download_interpolation.lock" ] && ./bin/download-tiger && install -D /dev/null /data/tmp/download_interpolation.lock || echo "Done!"
           volumeMounts:
             - name: configuration
               mountPath: /code/pelias.json
