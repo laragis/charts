@@ -1,20 +1,8 @@
 # Pelias
 
+## Using Helm
 
-
-## Test
-
-ElasticSearch
-
-```shell
-helm dependency update ../../bitnami/elasticsearch/17.9.29 --skip-refresh
-helm install pelias-elasticsearch \
-  ../../bitnami/elasticsearch/17.9.29 \
-  --namespace gtelmaps \
-  -f ./values-elasticsearch.yaml
-```
-
-Pelias
+### Install - Local
 
 ```shell
 helm dependency update ./ --skip-refresh
@@ -26,9 +14,8 @@ helm upgrade \
   -f values-custom.yaml
 ```
 
-Uninstall
+### Uninstall - Local
 
 ```shell
-helm uninstall pelias-elasticsearch -n gtelmaps
 helm uninstall pelias -n gtelmaps
 ```
