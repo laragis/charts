@@ -26,7 +26,7 @@ spec:
       annotations: {{- include "common.tplvalues.render" (dict "value" .Values.initJob.podAnnotations "context" $) | nindent 8 }}
       {{- end }}
     spec:
-      {{- include "pelias.imagePullSecrets" . | nindent 6 }}
+      {{- include "pelias.api.imagePullSecrets" . | nindent 6 }}
       restartPolicy: OnFailure
       {{- if .Values.initJob.podSecurityContext.enabled }}
       securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.initJob.podSecurityContext "context" $) | nindent 8 }}
@@ -39,7 +39,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-              [ ! -d "/data/whosonfirst" ] && ./bin/download || echo "Done!"
+              [ ! -f "/data/tmp/download_whosonfirst.lock" ] && ./bin/download && install -D /dev/null /data/tmp/download_whosonfirst.lock || echo "Done!"
           volumeMounts:
             - name: configuration
               mountPath: /code/pelias.json
@@ -53,7 +53,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-              [ ! -d "/data/openaddresses" ] && ./bin/download || echo "Done!"
+              [ ! -f "/data/tmp/download_openaddresses.lock" ] && ./bin/download && install -D /dev/null /data/tmp/download_openaddresses.lock || echo "Done!"
           volumeMounts:
             - name: configuration
               mountPath: /code/pelias.json
@@ -67,7 +67,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-              [ ! -d "/data/openstreetmap" ] && ./bin/download || echo "Done!"
+              [ ! -f "/data/tmp/download_openstreetmap.lock" ] && ./bin/download && install -D /dev/null /data/tmp/download_openstreetmap.lock || echo "Done!"
           volumeMounts:
             - name: configuration
               mountPath: /code/pelias.json
@@ -81,7 +81,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-              [ ! -d "/data/geonames" ] && ./bin/download || echo "Done!"
+              [ ! -f "/data/tmp/download_geonames.lock" ] && ./bin/download && install -D /dev/null /data/tmp/download_geonames.lock || echo "Done!"
           volumeMounts:
             - name: configuration
               mountPath: /code/pelias.json
@@ -95,7 +95,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-              [ ! -d "/data/interpolation" ] && ./bin/download-tiger || echo "Done!"
+              [ ! -f "/data/tmp/download_interpolation.lock" ] && ./bin/download && install -D /dev/null /data/tmp/download_interpolation.lock || echo "Done!"
           volumeMounts:
             - name: configuration
               mountPath: /code/pelias.json
@@ -109,7 +109,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-              [ ! -d "/data/transit" ] && ./bin/download || echo "Done!"
+              [ ! -f "/data/tmp/download_transit.lock" ] && ./bin/download && install -D /dev/null /data/tmp/download_transit.lock || echo "Done!"
           volumeMounts:
             - name: configuration
               mountPath: /code/pelias.json
@@ -123,7 +123,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-              [ ! -d "/data/csv" ] && ./bin/download || echo "Done!"
+              [ ! -f "/data/tmp/download_csv.lock" ] && ./bin/download && install -D /dev/null /data/tmp/download_csv.lock || echo "Done!"
           volumeMounts:
             - name: configuration
               mountPath: /code/pelias.json

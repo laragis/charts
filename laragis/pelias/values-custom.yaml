@@ -1,6 +1,20 @@
 diagnosticMode:
   enabled: false
 
+initJob:
+  elasticCreateIndex:
+    enabled: false
+  downloadData:
+    enabled: false
+  prepareData:
+    enabled: false
+  importData:
+    enabled: false
+
+  cleanupAfterFinished:
+    enabled: true
+    seconds: 120
+
 api:
   service:
     type: NodePort
@@ -17,6 +31,10 @@ interpolation:
 
 pip:
   enabled: true
+  livenessProbe:
+    enabled: false
+  readinessProbe:
+    enabled: false
   service:
     type: NodePort
 

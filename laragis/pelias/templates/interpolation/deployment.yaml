@@ -75,6 +75,15 @@ spec:
       topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.interpolation.topologySpreadConstraints "context" .) | nindent 8 }}
       {{- end }}
       initContainers:
+        - name: wait-for-data
+          image: jwilder/dockerize:0.6.1
+          args:
+            - -timeout=600s
+            - -wait
+            - file:///data/tmp/prepare_interpolation.lock
+          volumeMounts:
+            - name: data
+              mountPath: /data
         {{- if .Values.initContainers }}
         {{- include "common.tplvalues.render" (dict "value" .Values.initContainers "context" $) | trim | nindent 8 }}
         {{- end }}

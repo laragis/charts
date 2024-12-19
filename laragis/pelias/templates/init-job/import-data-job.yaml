@@ -26,7 +26,7 @@ spec:
       annotations: {{- include "common.tplvalues.render" (dict "value" .Values.initJob.podAnnotations "context" $) | nindent 8 }}
       {{- end }}
     spec:
-      {{- include "pelias.imagePullSecrets" . | nindent 6 }}
+      {{- include "pelias.api.imagePullSecrets" . | nindent 6 }}
       restartPolicy: OnFailure
       {{- if .Values.initJob.podSecurityContext.enabled }}
       securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.initJob.podSecurityContext "context" $) | nindent 8 }}
@@ -39,7 +39,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-              ./bin/start
+              [ ! -f "/data/tmp/import_whosonfirst.lock" ] && ./bin/start && install -D /dev/null /data/tmp/import_whosonfirst.lock || echo "Done!"
           volumeMounts:
             - name: configuration
               mountPath: /code/pelias.json
@@ -53,7 +53,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-              ./bin/parallel ${OPENADDRESSES_PARALLELISM:-1}
+              [ ! -f "/data/tmp/import_openaddresses.lock" ] && ./bin/parallel ${OPENADDRESSES_PARALLELISM:-1} && install -D /dev/null /data/tmp/import_openaddresses.lock || echo "Done!"
           volumeMounts:
             - name: configuration
               mountPath: /code/pelias.json
@@ -67,7 +67,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-              ./bin/start
+              [ ! -f "/data/tmp/import_openstreetmap.lock" ] && ./bin/start && install -D /dev/null /data/tmp/import_openstreetmap.lock || echo "Done!"
           volumeMounts:
             - name: configuration
               mountPath: /code/pelias.json
@@ -81,7 +81,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-              ./bin/start
+              [ ! -f "/data/tmp/import_polylines.lock" ] && ./bin/start && install -D /dev/null /data/tmp/import_polylines.lock || echo "Done!"
           volumeMounts:
             - name: configuration
               mountPath: /code/pelias.json
@@ -95,7 +95,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-              ./bin/start
+              [ ! -f "/data/tmp/import_geonames.lock" ] && ./bin/start && install -D /dev/null /data/tmp/import_geonames.lock || echo "Done!"
           volumeMounts:
             - name: configuration
               mountPath: /code/pelias.json
@@ -109,7 +109,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-              ./bin/start
+              [ ! -f "/data/tmp/import_transit.lock" ] && ./bin/start && install -D /dev/null /data/tmp/import_transit.lock || echo "Done!"
           volumeMounts:
             - name: configuration
               mountPath: /code/pelias.json
@@ -123,7 +123,7 @@ spec:
             - /bin/bash
             - -ec
             - |
-              ./bin/parallel ${CSV_PARALLELISM:-1}
+              [ ! -f "/data/tmp/import_csv.lock" ] && ./bin/parallel ${CSV_PARALLELISM:-1} && install -D /dev/null /data/tmp/import_csv.lock || echo "Done!"
           volumeMounts:
             - name: configuration
               mountPath: /code/pelias.json

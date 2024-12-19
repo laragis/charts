@@ -28,7 +28,7 @@ spec:
       annotations: {{- include "common.tplvalues.render" (dict "value" .Values.initJob.podAnnotations "context" $) | nindent 8 }}
       {{- end }}
     spec:
-      {{- include "pelias.imagePullSecrets" . | nindent 6 }}
+      {{- include "pelias.api.imagePullSecrets" . | nindent 6 }}
       restartPolicy: OnFailure
       {{- if .Values.initJob.podSecurityContext.enabled }}
       securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.initJob.podSecurityContext "context" $) | nindent 8 }}
@@ -62,10 +62,10 @@ spec:
               set -o nounset
               set -o pipefail
 
-              if [ ! -r "/data/pelias_index.lock" ]; then
+              if [ ! -r "/data/tmp/create_elastic_index.lock" ]; then
                 echo "Create elasticsearch index with pelias mapping"
                 ./bin/create_index
-                touch /data/pelias_index.lock
+                install -D /dev/null /data/tmp/create_elastic_index.lock
               fi
               
               echo "Done!"

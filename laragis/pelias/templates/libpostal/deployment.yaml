@@ -150,8 +150,7 @@ spec:
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.libpostal.customLivenessProbe "context" $) | nindent 12 }}
           {{- else if .Values.libpostal.livenessProbe.enabled }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.libpostal.livenessProbe "enabled") "context" $) | nindent 12 }}
-            httpGet:
-              path: /parse?address=47A Phạm Viết Chánh, Phường Nguyễn Cư Trinh, Quận 1, Thành phố Hồ Chí Minh, Việt Nam
+            tcpSocket:
               port: http
           {{- end }}
           {{- if .Values.libpostal.customReadinessProbe }}
