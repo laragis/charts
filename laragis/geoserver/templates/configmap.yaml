@@ -1,0 +1,76 @@
+{{- /*
+Copyright Broadcom, Inc. All Rights Reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}-envvars
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: geoserver
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+data:
+  # ######################
+  # Password env variables
+  # ######################
+  RESET_ADMIN_CREDENTIALS: {{ .Values.resetAdminCredentials | quote }}
+
+  # #################
+  # DATA DECLARATIONS
+  # #################
+  GEOSERVER_DATA_DIR: {{ .Values.geoserverDataDir | quote }}
+  GEOWEBCACHE_CACHE_DIR: {{ .Values.geowebcacheCacheDir | quote }}
+
+  # ###########################
+  # JVM ENTRYPOINT DECLARATIONS
+  # ###########################
+  INITIAL_MEMORY: {{ .Values.initialMemory | quote }}
+  MAXIMUM_MEMORY: {{ .Values.maximumMemory | quote }}
+  INITIAL_HEAP_OCCUPANCY_PERCENT: {{ .Values.initialHeapOccupancyPercent | quote }}
+  ADDITIONAL_JAVA_STARTUP_OPTIONS: {{ .Values.additionalJavaStartupOptions | quote }}
+  DISABLE_WEB_INTERFACE: {{ .Values.disableWebInterface | quote }}
+
+  # #####################
+  # Generic Env variables
+  # #####################
+  # Tomcat
+  TOMCAT_USER: {{ .Values.tomcat.user | quote }}
+  TOMCAT_PASSWORD: {{ .Values.tomcat.password | quote }}
+  TOMCAT_EXTRAS: {{ .Values.tomcat.extras | quote }}
+  
+  {{- if .Values.s3.serverUrl }}
+  # S3
+  S3_USERNAME: {{ .Values.s3.username | quote }}
+  S3_PASSWORD: {{ .Values.s3.password | quote }}
+  S3_SERVER_URL: {{ .Values.s3.serverUrl | quote }}
+  S3_ALIAS: {{ .Values.s3.alias | quote }}
+  {{- end }}
+
+  # Extensions
+  STABLE_EXTENSIONS: {{ .Values.stableExtensions | quote }}
+  COMMUNITY_EXTENSIONS: {{ .Values.communityExtensions | quote }}
+
+  # Other
+  ROOT_WEBAPP_REDIRECT: {{ .Values.rootWebappRedirect | quote }} 
+  GEOSERVER_CONTEXT_ROOT: {{ .Values.geoserverContextRoot | quote }} 
+  SAMPLE_DATA: {{ .Values.sampleData | quote }} 
+  GOOGLE_FONTS_NAMES: {{ .Values.googleFontsNames | quote }}
+  PROXY_BASE_URL_PARAMETRIZATION: {{ .Values.proxyBaseUrlParametrization | quote }}
+  CSRF_WHITELIST: {{ .Values.csrfWhitelist | quote }}
+  DISKQUOTA_DISABLED: {{ .Values.diskquotaDisabled | quote }}
+  DISK_QUOTA_SIZE: {{ .Values.diskQuotaSize | quote }}
+  DISK_QUOTA_FREQUENCY: {{ .Values.diskQuotaFrequency | quote }}
+  TIMEZONE: {{ .Values.timezone | quote }}
+  RECREATE_DATADIR: {{ .Values.recreateDatadir | quote }}
+  RECREATE_DISKQUOTA: {{ .Values.recreateDiskquota | quote }}
+  DISABLE_CORS: {{ .Values.disableCors | quote }}
+  DISABLE_SECURITY_FILTER: {{ .Values.disableSecurityFilter | quote }}
+  RESET_MONITORING_LOGS: {{ .Values.resetMonitoringLogs | quote }}
+  
+  # ###############################################
+  # SSL Settings
+  # ###############################################

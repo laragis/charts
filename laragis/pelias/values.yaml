@@ -18,7 +18,7 @@ global:
   ##   - myRegistryKeySecretName
   ##
   imagePullSecrets: []
-  defaultStorageClass: "nfs-client"
+  defaultStorageClass: ""
   ## Compatibility adaptations for Kubernetes platforms
   ##
   compatibility:

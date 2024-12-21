@@ -1,0 +1,28 @@
+# Copyright Broadcom, Inc. All Rights Reserved.
+# SPDX-License-Identifier: APACHE-2.0
+
+apiVersion: v2
+appVersion: 2.22.4
+dependencies:
+- name: common
+  repository: oci://registry-1.docker.io/bitnamicharts
+  tags:
+  - bitnami-common
+  version: 2.x.x
+- condition: postgresql.enabled
+  name: postgresql
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 16.x.x
+description: Chart for GeoServer
+home: http://geoserver.org
+icon: https://raw.githubusercontent.com/kartoza/charts/master/assets/logo/GeoServer_500.png
+keywords:
+  - GeoServer
+  - GIS
+maintainers:
+- name: Truong Thanh Tung
+  url: https://github.com/laragis/charts
+name: geoserver
+sources:
+- https://github.com/laragis/charts/tree/main/charts/geoserver
+version: 0.0.1

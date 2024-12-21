@@ -1,0 +1,57 @@
+{{- if and .Values.persistence.geoserverDataDir.enabled (not .Values.persistence.geoserverDataDir.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:  
+  name: {{ printf "%s-geoserver-data-dir" (include "geoserver.primary.fullname" .) }}
+  {{- if .Values.persistence.geoserverDataDir.annotations }}
+  annotations: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geoserverDataDir.annotations "context" $) | nindent 10 }}
+  {{- end }}
+  {{- if .Values.persistence.geoserverDataDir.labels }}
+  labels: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geoserverDataDir.labels "context" $) | nindent 10 }}
+    app.kubernetes.io/part-of: geoserver
+  {{- end }}
+spec:
+  accessModes:
+  {{- range .Values.persistence.geoserverDataDir.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  {{- if .Values.persistence.geoserverDataDir.dataSource }}
+  dataSource: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geoserverDataDir.dataSource "context" $) | nindent 10 }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.geoserverDataDir.size | quote }}
+  {{- if .Values.persistence.geoserverDataDir.selector }}
+  selector: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geoserverDataDir.selector "context" $) | nindent 10 }}
+  {{- end }}
+  {{- include "common.storage.class" (dict "persistence" .Values.persistence.geoserverDataDir "global" .Values.global) | nindent 8 }}
+{{- end -}}
+{{- if and .Values.persistence.geowebcacheCacheDir.enabled (not .Values.persistence.geowebcacheCacheDir.existingClaim) }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ printf "%s-geowebcache-cache-dir" (include "geoserver.primary.fullname" .) }}
+  {{- if .Values.persistence.geowebcacheCacheDir.annotations }}
+  annotations: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geowebcacheCacheDir.annotations "context" $) | nindent 10 }}
+  {{- end }}
+  {{- if .Values.persistence.geowebcacheCacheDir.labels }}
+  labels: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geowebcacheCacheDir.labels "context" $) | nindent 10 }}
+    app.kubernetes.io/part-of: geoserver
+  {{- end }}
+spec:
+  accessModes:
+  {{- range .Values.persistence.geowebcacheCacheDir.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  {{- if .Values.persistence.geowebcacheCacheDir.dataSource }}
+  dataSource: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geowebcacheCacheDir.dataSource "context" $) | nindent 10 }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.geowebcacheCacheDir.size | quote }}
+  {{- if .Values.persistence.geowebcacheCacheDir.selector }}
+  selector: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geowebcacheCacheDir.selector "context" $) | nindent 10 }}
+  {{- end }}
+  {{- include "common.storage.class" (dict "persistence" .Values.persistence.geowebcacheCacheDir "global" .Values.global) | nindent 8 }}
+{{- end -}}
