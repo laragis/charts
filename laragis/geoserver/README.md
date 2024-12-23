@@ -1,4 +1,4 @@
-# Pelias
+# GeoServer
 
 ## Using Helm
 
@@ -10,7 +10,7 @@ helm dependency update ./ --skip-refresh
 helm upgrade \
   --install geo-basemaps ./ \
   --namespace gtelmaps \
-  -f values-custom.yaml
+  -f values-example.yaml
 ```
 
 ### Uninstall - Local
