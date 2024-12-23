@@ -6,10 +6,9 @@
 
 ```shell
 helm dependency update ./ --skip-refresh
-# helm template pelias ./ -n gtelmaps -f values-custom.yaml > app.yaml
-kubectl apply -f deploy/storage
+# helm template geo-basemaps ./ -n gtelmaps -f values-custom.yaml > app.yaml
 helm upgrade \
-  --install pelias ./ \
+  --install geo-basemaps ./ \
   --namespace gtelmaps \
   -f values-custom.yaml
 ```
@@ -17,5 +16,5 @@ helm upgrade \
 ### Uninstall - Local
 
 ```shell
-helm uninstall pelias -n gtelmaps
+helm uninstall geo-basemaps -n gtelmaps
 ```

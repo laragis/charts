@@ -35,7 +35,7 @@ is true or default otherwise.
 {{/*
 Return true if a secret object should be created
 */}}
-{{- define "geoserver.createAdminSecret" -}}
+{{- define "geoserver.createAuthSecret" -}}
 {{- if not .Values.auth.existingSecret }}
     {{- true -}}
 {{- else -}}
@@ -45,11 +45,11 @@ Return true if a secret object should be created
 {{/*
 Return the GeoServer admin credentials secret
 */}}
-{{- define "geoserver.adminSecretName" -}}
+{{- define "geoserver.authSecretName" -}}
 {{- if .Values.auth.existingSecret -}}
     {{- printf "%s" (tpl .Values.auth.existingSecret $) -}}
 {{- else -}}
-    {{- printf "%s-admin" (include "common.names.fullname" .) -}}
+    {{- printf "%s-auth" (include "common.names.fullname" .) -}}
 {{- end -}}
 {{- end -}}
 

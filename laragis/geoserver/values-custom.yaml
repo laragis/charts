@@ -1,0 +1,33 @@
+global:
+  defaultStorageClass: "nfs-client"
+
+auth:
+  user: "admin"
+  password: "geoserver!araG1S"
+
+architecture: replication
+
+primary:
+  resourcesPreset: "none"
+  resources: {}
+  service:
+    type: NodePort
+    nodePorts:
+      http: ""
+
+secondary:
+  replicaCount: 2
+  resourcesPreset: "none"
+  resources: {}
+  service:
+    type: NodePort
+    nodePorts:
+      http: ""
+
+persistence:
+  geoserverDataDir:
+    enabled: true
+    existingClaim: ""
+  geowebcacheCacheDir:
+    enabled: true
+    existingClaim: ""

@@ -96,12 +96,12 @@ spec:
             - name: GEOSERVER_ADMIN_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "geoserver.adminSecretName" . }}
+                  name: {{ template "geoserver.authSecretName" . }}
                   key: {{ include "geoserver.adminSecretUserKey" . }}
             - name: GEOSERVER_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "geoserver.adminSecretName" . }}
+                  name: {{ include "geoserver.authSecretName" . }}
                   key: {{ include "geoserver.adminSecretPasswordKey" . }}
             {{- end }}
             {{- if eq .Values.architecture "replication" }}
@@ -170,14 +170,16 @@ spec:
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.primary.customLivenessProbe "context" $) | nindent 12 }}
           {{- else if .Values.primary.livenessProbe.enabled }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.primary.livenessProbe "enabled") "context" $) | nindent 12 }}
-            tcpSocket:
+            httpGet:
+              path: /{{ .Values.geoserverContextRoot }}
               port: http
           {{- end }}
           {{- if .Values.primary.customReadinessProbe }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.primary.customReadinessProbe "context" $) | nindent 12 }}
           {{- else if .Values.primary.readinessProbe.enabled }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.primary.readinessProbe "enabled") "context" $) | nindent 12 }}
-            tcpSocket:
+            httpGet:
+              path: /{{ .Values.geoserverContextRoot }}
               port: http
           {{- end }}
           {{- if .Values.primary.customStartupProbe }}

@@ -40,7 +40,7 @@ Access the pod you want to debug by executing
 
 2. Get the admin credentials:
 
-    echo "User: $(kubectl get secret {{ include "geoserver.adminSecretName" . }} --namespace {{ .Release.Namespace }} -o jsonpath="{.data.{{ include "geoserver.adminSecretUserKey" . }}}" | base64 -d)"
-    echo "Password: $(kubectl get secret {{ include "geoserver.adminSecretName" . }} --namespace {{ .Release.Namespace }} -o jsonpath="{.data.{{ include "geoserver.adminSecretPasswordKey" . }}}" | base64 -d)"
+    echo "User: $(kubectl get secret {{ include "geoserver.authSecretName" . }} --namespace {{ .Release.Namespace }} -o jsonpath="{.data.{{ include "geoserver.adminSecretUserKey" . }}}" | base64 -d)"
+    echo "Password: $(kubectl get secret {{ include "geoserver.authSecretName" . }} --namespace {{ .Release.Namespace }} -o jsonpath="{.data.{{ include "geoserver.adminSecretPasswordKey" . }}}" | base64 -d)"
 
 {{- end }}

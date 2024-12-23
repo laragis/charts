@@ -113,12 +113,12 @@ spec:
             - name: GEOSERVER_ADMIN_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "geoserver.adminSecretName" . }}
+                  name: {{ template "geoserver.authSecretName" . }}
                   key: {{ include "geoserver.adminSecretUserKey" . }}
             - name: GEOSERVER_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "geoserver.adminSecretName" . }}
+                  name: {{ include "geoserver.authSecretName" . }}
                   key: {{ include "geoserver.adminSecretPasswordKey" . }}
             {{- end }}
             {{- if eq .Values.architecture "replication" }}

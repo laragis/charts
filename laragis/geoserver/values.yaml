@@ -432,9 +432,10 @@ primary:
   ##
   livenessProbe:
     enabled: true    
-    initialDelaySeconds: 0
+    initialDelaySeconds: 60
     periodSeconds: 10
-    failureThreshold: 3
+    timeoutSeconds: 5
+    failureThreshold: 5
     successThreshold: 1
   ## Configure extra options for readiness probe
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
@@ -447,9 +448,10 @@ primary:
   ##
   readinessProbe:
     enabled: true
-    initialDelaySeconds: 0
+    initialDelaySeconds: 60
     periodSeconds: 10
-    failureThreshold: 3
+    timeoutSeconds: 5
+    failureThreshold: 5
     successThreshold: 1
   ## Configure extra options for startupProbe probe
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
@@ -462,9 +464,10 @@ primary:
   ##
   startupProbe:
     enabled: true
-    initialDelaySeconds: 0
-    periodSeconds: 5
-    failureThreshold: 60
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 5
     successThreshold: 1
   ## @param primary.customLivenessProbe Override default liveness probe for GeoServer primary containers
   ##
@@ -486,7 +489,7 @@ primary:
   service:
     ## @param primary.service.type GeoServer Primary K8s service type
     ##
-    type: NodePort
+    type: ClusterIP
     ## @param primary.service.ports.mysql GeoServer Primary K8s service port
     ## @param primary.service.ports.mysqlx GeoServer Primary K8s service mysqlx port
     ##
@@ -499,7 +502,7 @@ primary:
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
     ##
     nodePorts:
-      http: "31080"
+      http: ""
       https: ""
       broker: ""
     ## @param primary.service.clusterIP GeoServer Primary K8s service clusterIP IP
@@ -825,7 +828,7 @@ secondary:
   service:
     ## @param secondary.service.type GeoServer Secondary K8s service type
     ##
-    type: NodePort
+    type: ClusterIP
     ## @param secondary.service.ports.mysql GeoServer Secondary K8s service port
     ## @param secondary.service.ports.mysqlx GeoServer Secondary K8s service mysqlx port
     ##
