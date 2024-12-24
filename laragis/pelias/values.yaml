@@ -204,7 +204,7 @@ initJob:
   networkPolicy:
     ## @param initJob.networkPolicy.enabled Enable creation of NetworkPolicy resources
     ##
-    enabled: true
+    enabled: false
     ## @param initJob.networkPolicy.allowExternal The Policy model to apply
     ## When set to false, only pods with the correct client label will have network access to the ports Mastodon is
     ## listening on. When true, Mastodon will accept connections from any source (with the correct destination port).
@@ -699,7 +699,7 @@ api:
   networkPolicy:
     ## @param api.networkPolicy.enabled Specifies whether a NetworkPolicy should be created
     ##
-    enabled: true
+    enabled: false
     ## @param api.networkPolicy.allowExternal Don't require client label for connections
     ## The Policy model to apply. When set to false, only pods with the correct
     ## client label will have network access to the ports API is listening
@@ -1198,7 +1198,7 @@ interpolation:
   networkPolicy:
     ## @param interpolation.networkPolicy.enabled Specifies whether a NetworkPolicy should be created
     ##
-    enabled: true
+    enabled: false
     ## @param interpolation.networkPolicy.allowExternal Don't require client label for connections
     ## The Policy model to apply. When set to false, only pods with the correct
     ## client label will have network access to the ports Interpolation is listening
@@ -1697,7 +1697,7 @@ libpostal:
   networkPolicy:
     ## @param libpostal.networkPolicy.enabled Specifies whether a NetworkPolicy should be created
     ##
-    enabled: true
+    enabled: false
     ## @param libpostal.networkPolicy.allowExternal Don't require client label for connections
     ## The Policy model to apply. When set to false, only pods with the correct
     ## client label will have network access to the ports Libpostal is listening
@@ -2196,7 +2196,7 @@ pip:
   networkPolicy:
     ## @param pip.networkPolicy.enabled Specifies whether a NetworkPolicy should be created
     ##
-    enabled: true
+    enabled: false
     ## @param pip.networkPolicy.allowExternal Don't require client label for connections
     ## The Policy model to apply. When set to false, only pods with the correct
     ## client label will have network access to the ports PIP is listening
@@ -2695,7 +2695,7 @@ placeholder:
   networkPolicy:
     ## @param placeholder.networkPolicy.enabled Specifies whether a NetworkPolicy should be created
     ##
-    enabled: true
+    enabled: false
     ## @param placeholder.networkPolicy.allowExternal Don't require client label for connections
     ## The Policy model to apply. When set to false, only pods with the correct
     ## client label will have network access to the ports Placeholder is listening
