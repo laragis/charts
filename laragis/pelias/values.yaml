@@ -674,7 +674,7 @@ api:
   ## @param api.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `placeholder.pdb.minAvailable` and `placeholder.pdb.maxUnavailable` are empty.
   ##
   pdb:
-    create: true
+    create: false
     minAvailable: ""
     maxUnavailable: ""
   ## Autoscaling configuration
@@ -1173,7 +1173,7 @@ interpolation:
   ## @param interpolation.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `placeholder.pdb.minAvailable` and `placeholder.pdb.maxUnavailable` are empty.
   ##
   pdb:
-    create: true
+    create: false
     minAvailable: ""
     maxUnavailable: ""
   ## Autoscaling configuration
@@ -1672,7 +1672,7 @@ libpostal:
   ## @param libpostal.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `placeholder.pdb.minAvailable` and `placeholder.pdb.maxUnavailable` are empty.
   ##
   pdb:
-    create: true
+    create: false
     minAvailable: ""
     maxUnavailable: ""
   ## Autoscaling configuration
@@ -2171,7 +2171,7 @@ pip:
   ## @param pip.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `placeholder.pdb.minAvailable` and `placeholder.pdb.maxUnavailable` are empty.
   ##
   pdb:
-    create: true
+    create: false
     minAvailable: ""
     maxUnavailable: ""
   ## Autoscaling configuration
@@ -2670,7 +2670,7 @@ placeholder:
   ## @param placeholder.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `placeholder.pdb.minAvailable` and `placeholder.pdb.maxUnavailable` are empty.
   ##
   pdb:
-    create: true
+    create: false
     minAvailable: ""
     maxUnavailable: ""
   ## Autoscaling configuration
