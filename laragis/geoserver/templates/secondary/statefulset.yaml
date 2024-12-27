@@ -91,6 +91,10 @@ spec:
           {{- else if ne .Values.waitFor.resourcesPreset "none" }}
           resources: {{- include "common.resources.preset" (dict "type" .Values.waitFor.resourcesPreset) | nindent 12 }}
           {{- end }}
+      initContainers:
+        {{- if .Values.initContainers }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.initContainers "context" $) | trim | nindent 8 }}
+        {{- end }}
       containers:
         - name: geoserver
           image: {{ include "geoserver.image" . }}
@@ -137,15 +141,32 @@ spec:
             - name: EMBEDDED_BROKER
               value: "disabled"
             {{- end }}
+            {{- if .Values.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
             {{- if .Values.secondary.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.secondary.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}
           envFrom:
             - configMapRef:
                 name: {{ include "common.names.fullname" . }}-envvars
+            {{- if .Values.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ .Values.extraEnvVarsCM }}
+            {{- end }}
+            {{- if .Values.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ .Values.extraEnvVarsSecret }}
+            {{- end }}
             {{- if .Values.secondary.extraEnvVarsCM }}
             - configMapRef:
                 name: {{ include "common.tplvalues.render" (dict "value" .Values.secondary.extraEnvVarsCM "context" $) }}
+            {{- end }}
+            {{- if .Values.extraEnvVarsSecrets }}
+            {{- range .Values.extraEnvVarsSecrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
             {{- end }}
             {{- if .Values.secondary.extraEnvVarsSecret }}
             - secretRef:
@@ -167,6 +188,9 @@ spec:
           resources: {{- include "common.resources.preset" (dict "type" .Values.secondary.resourcesPreset) | nindent 12 }}
           {{- end }}
           volumeMounts:
+            {{- if .Values.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
             - name: {{ .Values.persistence.geoserverDataDir.volumeName }}
               mountPath: {{ include "geoserver.geoserverDataDir.mountPath" . }}
               {{- if .Values.persistence.geoserverDataDir.subPath }}
@@ -206,10 +230,16 @@ spec:
           {{- if .Values.secondary.lifecycleHooks }}
           lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.secondary.lifecycleHooks "context" $) | nindent 12 }}
           {{- end }}
+        {{- if .Values.sidecars }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.sidecars "context" $) | trim | nindent 8 }}
+        {{- end }}
         {{- if .Values.secondary.sidecars }}
         {{- include "common.tplvalues.render" (dict "value" .Values.secondary.sidecars "context" $) | nindent 8 }}
         {{- end }}
       volumes:
+        {{- if .Values.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
         - name: {{ .Values.persistence.geoserverDataDir.volumeName }}
         {{- if .Values.persistence.geoserverDataDir.enabled }}
           persistentVolumeClaim:

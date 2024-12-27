@@ -115,6 +115,46 @@ auth:
 ## @param architecture GeoServer architecture (`standalone` or `replication`)
 ##
 architecture: standalone
+## @param extraEnvVars Add extra environment variables for all the GeoServer pods
+##
+extraEnvVars: []
+## @param extraEnvVarsCM ConfigMap with extra environment variables for all the GeoServer pods
+##
+extraEnvVarsCM: ""
+## @param extraEnvVarsSecret Secret with extra environment variables for all the GeoServer pods
+##
+extraEnvVarsSecret: ""
+## @param extraEnvVarsSecrets List of secrets with extra environment variables for all the GeoServer pods
+##
+extraEnvVarsSecrets: []
+## @param sidecars Add additional sidecar containers to all the GeoServer pods
+## Example:
+## sidecars:
+##   - name: your-image-name
+##     image: your-image
+##     imagePullPolicy: Always
+##     ports:
+##       - name: portname
+##         containerPort: 1234
+##
+sidecars: []
+## @param initContainers Add additional init containers to all the GeoServer pods
+## Example:
+## initContainers:
+##   - name: your-image-name
+##     image: your-image
+##     imagePullPolicy: Always
+##     ports:
+##       - name: portname
+##         containerPort: 1234
+##
+initContainers: []
+## @param extraVolumeMounts Optionally specify extra list of additional volumeMounts for all the GeoServer pods
+##
+extraVolumeMounts: []
+## @param extraVolumes Optionally specify extra list of additional volumes for the all the GeoServer pods
+##
+extraVolumes: []
 
 ## @section GeoServer Configuration parameters
 ## GeoServer settings based on environment variables
