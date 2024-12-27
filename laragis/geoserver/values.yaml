@@ -1093,20 +1093,62 @@ ingress:
 ## ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
 ##
 persistence:
+  ## @param primary.persistence.geowebcacheCacheDir.volumeName Name to assign the volume
+  ##
+  volumeName: "geowebcache-cache-dir"
+  ## @param persistence.geowebcacheCacheDir.mountPath Path to mount the volume at.
+  ##
+  mountPath: ""
+  ## @param persistence.geowebcacheCacheDir.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
+  ##
+  subPath: ""
+  ## @param persistence.geowebcacheCacheDir.storageClass Storage class of backing PVC
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  storageClass: ""
+  ## @param persistence.geowebcacheCacheDir.annotations Persistent Volume Claim annotations
+  ##
+  annotations: {}
+  ## @param persistence.geowebcacheCacheDir.accessModes Persistent Volume Access Modes
+  ##
+  accessModes:
+    - ReadWriteOnce
+  ## @param persistence.geowebcacheCacheDir.size Size of data volume
+  ##
+  size: 8Gi
+  ## @param persistence.geowebcacheCacheDir.existingClaim The name of an existing PVC to use for persistence
+  ##
+  existingClaim: ""
+  ## @param persistence.geowebcacheCacheDir.selector Selector to match an existing Persistent Volume for WordPress data PVC
+  ## If set, the PVC can't have a PV dynamically provisioned for it
+  ## E.g.
+  ## selector:
+  ##   matchLabels:
+  ##     app: my-app
+  ##
+  selector: {}
+  ## @param persistence.geowebcacheCacheDir.dataSource Custom PVC data source
+  ##
+  dataSource: {}
+  
   geoserverDataDir:
-    ## @param persistence.enabled Enable persistence using Persistent Volume Claims
+    ## @param persistence.geoserverDataDir.enabled Enable persistence using Persistent Volume Claims
     ##
     enabled: false
-    ## @param persistence.volumeName Name to assign the volume
+    ## @param persistence.geoserverDataDir.volumeName Name to assign the volume
     ##
     volumeName: "geoserver-data-dir"
-    ## @param persistence.mountPath Path to mount the volume at.
+    ## @param persistence.geoserverDataDir.mountPath Path to mount the volume at.
     ##
     mountPath: ""
-    ## @param persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
+    ## @param persistence.geoserverDataDir.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
     ##
     subPath: ""
-    ## @param persistence.storageClass Storage class of backing PVC
+    ## @param persistence.geoserverDataDir.storageClass Storage class of backing PVC
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
     ## If undefined (the default) or set to null, no storageClassName spec is
@@ -1114,20 +1156,20 @@ persistence:
     ##   GKE, AWS & OpenStack)
     ##
     storageClass: ""
-    ## @param persistence.annotations Persistent Volume Claim annotations
+    ## @param persistence.geoserverDataDir.annotations Persistent Volume Claim annotations
     ##
     annotations: {}
-    ## @param persistence.accessModes Persistent Volume Access Modes
+    ## @param persistence.geoserverDataDir.accessModes Persistent Volume Access Modes
     ##
     accessModes:
       - ReadWriteOnce
-    ## @param persistence.size Size of data volume
+    ## @param persistence.geoserverDataDir.size Size of data volume
     ##
     size: 8Gi
-    ## @param persistence.existingClaim The name of an existing PVC to use for persistence
+    ## @param persistence.geoserverDataDir.existingClaim The name of an existing PVC to use for persistence
     ##
     existingClaim: ""
-    ## @param persistence.selector Selector to match an existing Persistent Volume for WordPress data PVC
+    ## @param persistence.geoserverDataDir.selector Selector to match an existing Persistent Volume for WordPress data PVC
     ## If set, the PVC can't have a PV dynamically provisioned for it
     ## E.g.
     ## selector:
@@ -1135,23 +1177,23 @@ persistence:
     ##     app: my-app
     ##
     selector: {}
-    ## @param persistence.dataSource Custom PVC data source
+    ## @param persistence.geoserverDataDir.dataSource Custom PVC data source
     ##
     dataSource: {}
   geowebcacheCacheDir:
-    ## @param persistence.enabled Enable persistence using Persistent Volume Claims
+    ## @param persistence.geowebcacheCacheDir.enabled Enable persistence using Persistent Volume Claims
     ##
     enabled: false
-    ## @param primary.persistence.volumeName Name to assign the volume
+    ## @param primary.persistence.geowebcacheCacheDir.volumeName Name to assign the volume
     ##
     volumeName: "geowebcache-cache-dir"
-    ## @param persistence.mountPath Path to mount the volume at.
+    ## @param persistence.geowebcacheCacheDir.mountPath Path to mount the volume at.
     ##
     mountPath: ""
-    ## @param persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
+    ## @param persistence.geowebcacheCacheDir.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
     ##
     subPath: ""
-    ## @param persistence.storageClass Storage class of backing PVC
+    ## @param persistence.geowebcacheCacheDir.storageClass Storage class of backing PVC
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
     ## If undefined (the default) or set to null, no storageClassName spec is
@@ -1159,20 +1201,20 @@ persistence:
     ##   GKE, AWS & OpenStack)
     ##
     storageClass: ""
-    ## @param persistence.annotations Persistent Volume Claim annotations
+    ## @param persistence.geowebcacheCacheDir.annotations Persistent Volume Claim annotations
     ##
     annotations: {}
-    ## @param persistence.accessModes Persistent Volume Access Modes
+    ## @param persistence.geowebcacheCacheDir.accessModes Persistent Volume Access Modes
     ##
     accessModes:
       - ReadWriteOnce
-    ## @param persistence.size Size of data volume
+    ## @param persistence.geowebcacheCacheDir.size Size of data volume
     ##
     size: 8Gi
-    ## @param persistence.existingClaim The name of an existing PVC to use for persistence
+    ## @param persistence.geowebcacheCacheDir.existingClaim The name of an existing PVC to use for persistence
     ##
     existingClaim: ""
-    ## @param persistence.selector Selector to match an existing Persistent Volume for WordPress data PVC
+    ## @param persistence.geowebcacheCacheDir.selector Selector to match an existing Persistent Volume for WordPress data PVC
     ## If set, the PVC can't have a PV dynamically provisioned for it
     ## E.g.
     ## selector:
@@ -1180,7 +1222,7 @@ persistence:
     ##     app: my-app
     ##
     selector: {}
-    ## @param persistence.dataSource Custom PVC data source
+    ## @param persistence.geowebcacheCacheDir.dataSource Custom PVC data source
     ##
     dataSource: {}
 

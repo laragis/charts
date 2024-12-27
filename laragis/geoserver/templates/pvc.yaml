@@ -7,7 +7,7 @@ metadata:
   labels: {{- include "common.labels.standard" ( dict "customLabels" $labels "context" $ ) | nindent 4 }}
     app.kubernetes.io/part-of: geoserver
   {{- if .Values.persistence.geoserverDataDir.annotations }}
-  annotations: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geoserverDataDir.annotations "context" $) | nindent 10 }}
+  annotations: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geoserverDataDir.annotations "context" $) | nindent 4 }}
   {{- end }}
 spec:
   accessModes:
@@ -15,15 +15,15 @@ spec:
     - {{ . | quote }}
   {{- end }}
   {{- if .Values.persistence.geoserverDataDir.dataSource }}
-  dataSource: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geoserverDataDir.dataSource "context" $) | nindent 10 }}
+  dataSource: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geoserverDataDir.dataSource "context" $) | nindent 4 }}
   {{- end }}
   resources:
     requests:
       storage: {{ .Values.persistence.geoserverDataDir.size | quote }}
   {{- if .Values.persistence.geoserverDataDir.selector }}
-  selector: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geoserverDataDir.selector "context" $) | nindent 10 }}
+  selector: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geoserverDataDir.selector "context" $) | nindent 4 }}
   {{- end }}
-  {{- include "common.storage.class" (dict "persistence" .Values.persistence.geoserverDataDir "global" .Values.global) | nindent 8 }}
+  {{- include "common.storage.class" (dict "persistence" .Values.persistence.geoserverDataDir "global" .Values.global) | nindent 2 }}
 {{- end -}}
 {{- if and .Values.persistence.geowebcacheCacheDir.enabled (not .Values.persistence.geowebcacheCacheDir.existingClaim) }}
 ---
@@ -35,7 +35,7 @@ metadata:
   labels: {{- include "common.labels.standard" ( dict "customLabels" $labels "context" $ ) | nindent 4 }}
     app.kubernetes.io/part-of: geoserver
   {{- if .Values.persistence.geowebcacheCacheDir.annotations }}
-  annotations: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geowebcacheCacheDir.annotations "context" $) | nindent 10 }}
+  annotations: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geowebcacheCacheDir.annotations "context" $) | nindent 4 }}
   {{- end }}
 spec:
   accessModes:
@@ -43,13 +43,13 @@ spec:
     - {{ . | quote }}
   {{- end }}
   {{- if .Values.persistence.geowebcacheCacheDir.dataSource }}
-  dataSource: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geowebcacheCacheDir.dataSource "context" $) | nindent 10 }}
+  dataSource: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geowebcacheCacheDir.dataSource "context" $) | nindent 4 }}
   {{- end }}
   resources:
     requests:
       storage: {{ .Values.persistence.geowebcacheCacheDir.size | quote }}
   {{- if .Values.persistence.geowebcacheCacheDir.selector }}
-  selector: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geowebcacheCacheDir.selector "context" $) | nindent 10 }}
+  selector: {{- include "common.tplvalues.render" (dict "value" .Values.persistence.geowebcacheCacheDir.selector "context" $) | nindent 4 }}
   {{- end }}
-  {{- include "common.storage.class" (dict "persistence" .Values.persistence.geowebcacheCacheDir "global" .Values.global) | nindent 8 }}
+  {{- include "common.storage.class" (dict "persistence" .Values.persistence.geowebcacheCacheDir "global" .Values.global) | nindent 2 }}
 {{- end -}}

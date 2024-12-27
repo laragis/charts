@@ -6,7 +6,7 @@
 
 ```shell
 helm dependency update ./ --skip-refresh
-# helm template geo-basemaps ./ -n gtelmaps -f values-custom.yaml > app.yaml
+# helm template geo-basemaps ./ -n gtelmaps -f values-example.yaml > app.yaml
 helm upgrade \
   --install geo-basemaps ./ \
   --namespace gtelmaps \
