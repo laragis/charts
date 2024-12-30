@@ -122,8 +122,8 @@ spec:
             - name: POSTGRES_PASS
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "ms.database.secretName" . }}
-                  key: {{ include "ms.database.secretPasswordKey" . }}
+                  name: {{ include "geoserver.database.secretName" . }}
+                  key: {{ include "geoserver.database.secretPasswordKey" . }}
             - name: POSTGRES_SCHEMA
               value: "public"
             {{- end }}

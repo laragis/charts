@@ -5,7 +5,20 @@ auth:
   user: "admin"
   password: "geoserver!araG1S"
 
-architecture: replication
+architecture: standalone
+
+extraEnvVars:
+  - name: DB_LOWRES
+    value: "osm_lowres"
+  - name: DB_EXTRAS
+    value: "osm_extras"
+  - name: DB_GWC
+    value: "osm_gwc"
+
+initialMemory: "10G"
+maximumMemory: "20G"
+diskquotaDisabled: "true"
+stableExtensions: "css-plugin,feature-pregeneralized-plugin,web-resource-plugin"
 
 primary:
   resourcesPreset: "none"
@@ -13,7 +26,7 @@ primary:
   service:
     type: NodePort
     nodePorts:
-      http: ""
+      http: "31080"
 
 secondary:
   replicaCount: 1
@@ -31,3 +44,13 @@ persistence:
   geowebcacheCacheDir:
     enabled: true
     existingClaim: ""
+
+externalDatabase:
+  host: "db-postgresql-primary"
+  # host: "localhost"
+  user: postgres
+  password: ""
+  existingSecret: "db-postgresql"
+  existingSecretPasswordKey: "postgres-password"
+  database: test-geoserver
+  port: 5432

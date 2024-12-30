@@ -24,6 +24,7 @@ data:
   # #################
   GEOSERVER_DATA_DIR: {{ .Values.geoserverDataDir | quote }}
   GEOWEBCACHE_CACHE_DIR: {{ .Values.geowebcacheCacheDir | quote }}
+  FONTS_DIR: {{ .Values.fontsDir | quote }}
 
   # ###########################
   # JVM ENTRYPOINT DECLARATIONS
@@ -59,7 +60,6 @@ data:
   GEOSERVER_CONTEXT_ROOT: {{ .Values.geoserverContextRoot | quote }} 
   SAMPLE_DATA: {{ .Values.sampleData | quote }} 
   GOOGLE_FONTS_NAMES: {{ .Values.googleFontsNames | quote }}
-  PROXY_BASE_URL_PARAMETRIZATION: {{ .Values.proxyBaseUrlParametrization | quote }}
   CSRF_WHITELIST: {{ .Values.csrfWhitelist | quote }}
   DISKQUOTA_DISABLED: {{ .Values.diskquotaDisabled | quote }}
   DISK_QUOTA_SIZE: {{ .Values.diskQuotaSize | quote }}
@@ -70,7 +70,15 @@ data:
   DISABLE_CORS: {{ .Values.disableCors | quote }}
   DISABLE_SECURITY_FILTER: {{ .Values.disableSecurityFilter | quote }}
   RESET_MONITORING_LOGS: {{ .Values.resetMonitoringLogs | quote }}
-  
+  ALLOW_ENV_PARAMETRIZATION: {{ .Values.allowEnvParametrization | quote }}
+  XFRAME_OPTIONS: {{ .Values.xframeOptions | quote }}
+  PARALLEL_REQUEST: {{ .Values.parallelRequest | quote }}
+  GETMAP: {{ .Values.getmap | quote }}
+  SINGLE_USER: {{ .Values.singleUser | quote }}
+  GWC_REQUEST: {{ .Values.gwcRequest | quote }}
+  WPS_REQUEST: {{ .Values.wpsRequest | quote }}
+  USER_WMS_REQUEST: {{ .Values.userWmsRequest | quote }}
+
   # ###############################################
   # SSL Settings
   # ###############################################

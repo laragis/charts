@@ -172,6 +172,9 @@ geoserverDataDir: "/opt/geoserver/data_dir"
 ## ref: https://docs.geoserver.org/latest/en/user/geowebcache/config.html#changing-the-cache-directory
 ##
 geowebcacheCacheDir: "/opt/geoserver/data_dir/gwc"
+## @param fontsDir
+##
+fontsDir: "/opt/fonts"
 ## @param initialMemory
 ##
 initialMemory: "2G"
@@ -240,7 +243,7 @@ csrfWhitelist: ""
 diskquotaDisabled: "false"
 ## @param diskQuotaSize
 ##
-diskQuotaSize: "20"
+diskQuotaSize: "40"
 ## @param diskQuotaFrequency
 ##
 diskQuotaFrequency: "5"
@@ -262,6 +265,31 @@ disableSecurityFilter: "false"
 ## @param resetMonitoringLogs
 ##
 resetMonitoringLogs: "false"
+## @param allowEnvParametrization
+##
+allowEnvParametrization: "true"
+## @param xframeOptions
+##
+xframeOptions: "true"
+## @param parallelRequest
+##
+parallelRequest: 100
+## @param getmap
+##
+getmap: 10
+## @param singleUser
+##
+singleUser: 6
+## @param gwcRequest
+##
+gwcRequest: 16
+## @param wpsRequest
+##
+wpsRequest: "1000/d;30s"
+## @param userWmsRequest
+##
+userWmsRequest: "30/s"
+
 
 ## @section GeoServer Primary parameters
 ##
@@ -1028,7 +1056,7 @@ networkPolicy:
 ingress:
   ## @param ingress.enabled Enable ingress record generation for %%MAIN_CONTAINER_NAME%%
   ##
-  enabled: true
+  enabled: false
   ## @param ingress.pathType Ingress path type
   ##
   pathType: ImplementationSpecific
@@ -1438,7 +1466,7 @@ postgresql:
 externalDatabase:
   ## @param externalDatabase.host Host of an external PostgreSQL instance to connect (only if postgresql.enabled=false)
   ##
-  host: ""
+  host: "localhost"
   ## @param externalDatabase.user User of an external PostgreSQL instance to connect (only if postgresql.enabled=false)
   ##
   user: postgres
@@ -1449,6 +1477,10 @@ externalDatabase:
   ## Name of an existing secret resource containing the DB password in a 'password' key
   ##
   existingSecret: ""
+  ## @param externalDatabase.existingSecret Secret containing the password of an external PostgreSQL instance to connect (only if postgresql.enabled=false)
+  ## Name of an existing secret key containing the database credentials
+  ##
+  existingSecretPasswordKey: ""
   ## @param externalDatabase.database Database inside an external PostgreSQL to connect (only if postgresql.enabled=false)
   ##
   database: postgres

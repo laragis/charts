@@ -192,6 +192,17 @@ Return the Database User
 {{- end -}}
 
 {{/*
+Return the Database database name
+*/}}
+{{- define "geoserver.database.name" -}}
+{{- if .Values.postgresql.enabled }}
+    {{- printf "%s" .Values.postgresql.auth.database -}}
+{{- else -}}
+    {{- printf "%s" .Values.externalDatabase.database -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Return the Database secret name
 */}}
 {{- define "geoserver.database.secretName" -}}
