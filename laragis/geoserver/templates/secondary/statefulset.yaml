@@ -91,7 +91,6 @@ spec:
           {{- else if ne .Values.waitFor.resourcesPreset "none" }}
           resources: {{- include "common.resources.preset" (dict "type" .Values.waitFor.resourcesPreset) | nindent 12 }}
           {{- end }}
-      initContainers:
         {{- if .Values.initContainers }}
         {{- include "common.tplvalues.render" (dict "value" .Values.initContainers "context" $) | trim | nindent 8 }}
         {{- end }}
