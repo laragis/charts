@@ -41,6 +41,7 @@ data:
   # MAX_FILTER_RULES: "20"
   # OPTIMIZE_LINE_WIDTH: "false"
   ALLOW_ENV_PARAMETRIZATION: {{ .Values.allowEnvParametrization | quote }}
+  PROXY_BASE_URL_PARAMETRIZATION: {{ .Values.allowEnvParametrization | quote }}
   # CHARACTER_ENCODING: "UTF-8"
   # GEOSERVER_FILEBROWSER_HIDEFS: "false"
   # USE_DATETIME_IN_SHAPEFILE: "true"

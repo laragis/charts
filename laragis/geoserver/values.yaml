@@ -81,7 +81,7 @@ diagnosticMode:
 image:
   registry: docker.io
   repository: kartoza/geoserver
-  tag: 2.22.4
+  tag: 2.26.1
   digest: ""
   ## Specify a imagePullPolicy
   ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -171,7 +171,7 @@ geoserverDataDir: "/opt/geoserver/data_dir"
 ## @param geowebcacheCacheDir
 ## ref: https://docs.geoserver.org/latest/en/user/geowebcache/config.html#changing-the-cache-directory
 ##
-geowebcacheCacheDir: "/opt/geoserver/data_dir/gwc"
+geowebcacheCacheDir: "/opt/geoserver/gwc"
 ## @param fontsDir Path where .ttf and otf font should be added
 ##
 fontsDir: "/opt/fonts"

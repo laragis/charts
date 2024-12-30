@@ -17,11 +17,19 @@ extraEnvVars:
 
 initialMemory: "10G"
 maximumMemory: "20G"
+diskQuotaSize: "1000"
 stableExtensions: "css-plugin,feature-pregeneralized-plugin,web-resource-plugin"
+fontsDir: "/opt/geoserver/data_dir/fonts"
 
 primary:
   resourcesPreset: "none"
   resources: {}
+  livenessProbe:
+    enabled: false
+  readinessProbe:
+    enabled: false
+  startupProbe:
+    enabled: false
   service:
     type: NodePort
     nodePorts:
@@ -35,14 +43,18 @@ secondary:
     type: NodePort
     nodePorts:
       http: ""
+  autoscaling:
+    hpa:
+      enabled: false
+
 
 persistence:
   geoserverDataDir:
     enabled: true
-    existingClaim: ""
+    existingClaim: "geo-basemaps-geoserver-geoserver-data-dir"
   geowebcacheCacheDir:
     enabled: true
-    existingClaim: ""
+    existingClaim: "geo-basemaps-geoserver-geowebcache-cache-dir"
 
 externalDatabase:
   host: "db-postgresql-primary"
@@ -50,5 +62,5 @@ externalDatabase:
   password: ""
   existingSecret: "db-postgresql"
   existingSecretPasswordKey: "postgres-password"
-  database: test-geoserver
+  database: osm
   port: 5432
