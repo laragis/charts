@@ -137,3 +137,103 @@ Return Broker port
 {{ .Values.primary.containerPorts.broker | default 61661 }}
 {{- end -}}
 
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "geoserver.postgresql.fullname" -}}
+{{- include "common.names.dependency.fullname" (dict "chartName" "postgresql" "chartValues" .Values.postgresql "context" $) -}}
+{{- end -}}
+
+{{/*
+Return whether Database is enabled or not.
+*/}}
+{{- define "geoserver.database.enabled" -}}
+{{- if or .Values.postgresql.enabled (and (not .Values.postgresql.enabled) (ne .Values.externalDatabase.host "localhost")) }}
+    {{- true -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the Database Hostname
+*/}}
+{{- define "geoserver.database.host" -}}
+{{- if .Values.postgresql.enabled }}
+    {{- if eq .Values.postgresql.architecture "replication" }}
+        {{- printf "%s-primary" (include "geoserver.postgresql.fullname" .) | trunc 63 | trimSuffix "-" -}}
+    {{- else -}}
+        {{- printf "%s" (include "geoserver.postgresql.fullname" .) -}}
+    {{- end -}}
+{{- else -}}
+    {{- printf "%s" .Values.externalDatabase.host -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the Database Port
+*/}}
+{{- define "geoserver.database.port" -}}
+{{- if .Values.postgresql.enabled }}
+    {{- print .Values.postgresql.primary.service.ports.postgresql -}}
+{{- else -}}
+    {{- printf "%d" (.Values.externalDatabase.port | int ) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the Database User
+*/}}
+{{- define "geoserver.database.user" -}}
+{{- if .Values.postgresql.enabled }}
+    {{- printf "%s" .Values.postgresql.auth.username -}}
+{{- else -}}
+    {{- printf "%s" .Values.externalDatabase.user -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the Database secret name
+*/}}
+{{- define "geoserver.database.secretName" -}}
+{{- if .Values.postgresql.enabled }}
+    {{- if .Values.postgresql.auth.existingSecret -}}
+        {{- printf "%s" .Values.postgresql.auth.existingSecret -}}
+    {{- else -}}
+        {{- printf "%s" (include "geoserver.postgresql.fullname" .) -}}
+    {{- end -}}
+{{- else if .Values.externalDatabase.existingSecret -}}
+    {{- include "common.tplvalues.render" (dict "value" .Values.externalDatabase.existingSecret "context" $) -}}
+{{- else -}}
+    {{- printf "%s-externaldb" (include "common.names.fullname" .) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the Database password secret key
+*/}}
+{{- define "geoserver.database.secretPasswordKey" -}}
+{{- if .Values.postgresql.enabled -}}
+    {{- print "password" -}}
+{{- else -}}
+    {{- if .Values.externalDatabase.existingSecret -}}
+        {{- default "password" .Values.externalDatabase.existingSecretPasswordKey }}
+    {{- else -}}
+        {{- print "password" -}}
+    {{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the Database password secret key
+*/}}
+{{- define "geoserver.database.secretPostgresPasswordKey" -}}
+{{- if .Values.postgresql.enabled -}}
+    {{- print "postgres-password" -}}
+{{- else -}}
+    {{- if .Values.externalDatabase.existingSecret -}}
+        {{- default "postgres-password" .Values.externalDatabase.existingSecretPostgresPasswordKey }}
+    {{- else -}}
+        {{- print "postgres-password" -}}
+    {{- end -}}
+{{- end -}}
+{{- end -}}

@@ -16,7 +16,7 @@ primary:
       http: ""
 
 secondary:
-  replicaCount: 2
+  replicaCount: 1
   resourcesPreset: "none"
   resources: {}
   service:
