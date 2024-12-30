@@ -32,8 +32,29 @@ data:
   INITIAL_MEMORY: {{ .Values.initialMemory | quote }}
   MAXIMUM_MEMORY: {{ .Values.maximumMemory | quote }}
   INITIAL_HEAP_OCCUPANCY_PERCENT: {{ .Values.initialHeapOccupancyPercent | quote }}
-  ADDITIONAL_JAVA_STARTUP_OPTIONS: {{ .Values.additionalJavaStartupOptions | quote }}
+  # ENCODING: "UTF8"
+  TIMEZONE: {{ .Values.timezone | quote }}
+  # LANGUAGE: "en"
+  # REGION: "US"
+  # COUNTRY: "US"
+  # ENABLE_JSONP: "true"
+  # MAX_FILTER_RULES: "20"
+  # OPTIMIZE_LINE_WIDTH: "false"
+  ALLOW_ENV_PARAMETRIZATION: {{ .Values.allowEnvParametrization | quote }}
+  # CHARACTER_ENCODING: "UTF-8"
+  # GEOSERVER_FILEBROWSER_HIDEFS: "false"
+  # USE_DATETIME_IN_SHAPEFILE: "true"
+  # LOGIN_STATUS: "on"
+  # UPDATE_LOGGING_PROFILES: "false"
+  # RELINQUISH_LOG4J_CONTROL: "false"
   DISABLE_WEB_INTERFACE: {{ .Values.disableWebInterface | quote }}
+  DISKQUOTA_DISABLED: {{ .Values.diskquotaDisabled | quote }}
+  CSRF_WHITELIST: {{ .Values.csrfWhitelist | quote }}
+  XFRAME_OPTIONS: {{ .Values.xframeOptions | quote }}
+  # GEOSERVER_REQUIRE_FILE: ""
+  # ENTITY_RESOLUTION_ALLOWLIST: "www.w3.org|schemas.opengis.net|www.opengis.net|inspire.ec.europa.eu/schemas"
+  GEOSERVER_DISABLE_STATIC_WEB_FILES: {{ .Values.geoserverDisableStaticWebFiles | quote }}
+  ADDITIONAL_JAVA_STARTUP_OPTIONS: {{ .Values.additionalJavaStartupOptions | quote }}
 
   # #####################
   # Generic Env variables
@@ -60,18 +81,13 @@ data:
   GEOSERVER_CONTEXT_ROOT: {{ .Values.geoserverContextRoot | quote }} 
   SAMPLE_DATA: {{ .Values.sampleData | quote }} 
   GOOGLE_FONTS_NAMES: {{ .Values.googleFontsNames | quote }}
-  CSRF_WHITELIST: {{ .Values.csrfWhitelist | quote }}
-  DISKQUOTA_DISABLED: {{ .Values.diskquotaDisabled | quote }}
   DISK_QUOTA_SIZE: {{ .Values.diskQuotaSize | quote }}
   DISK_QUOTA_FREQUENCY: {{ .Values.diskQuotaFrequency | quote }}
-  TIMEZONE: {{ .Values.timezone | quote }}
   RECREATE_DATADIR: {{ .Values.recreateDatadir | quote }}
   RECREATE_DISKQUOTA: {{ .Values.recreateDiskquota | quote }}
   DISABLE_CORS: {{ .Values.disableCors | quote }}
   DISABLE_SECURITY_FILTER: {{ .Values.disableSecurityFilter | quote }}
   RESET_MONITORING_LOGS: {{ .Values.resetMonitoringLogs | quote }}
-  ALLOW_ENV_PARAMETRIZATION: {{ .Values.allowEnvParametrization | quote }}
-  XFRAME_OPTIONS: {{ .Values.xframeOptions | quote }}
   PARALLEL_REQUEST: {{ .Values.parallelRequest | quote }}
   GETMAP: {{ .Values.getmap | quote }}
   SINGLE_USER: {{ .Values.singleUser | quote }}

@@ -172,7 +172,7 @@ geoserverDataDir: "/opt/geoserver/data_dir"
 ## ref: https://docs.geoserver.org/latest/en/user/geowebcache/config.html#changing-the-cache-directory
 ##
 geowebcacheCacheDir: "/opt/geoserver/data_dir/gwc"
-## @param fontsDir
+## @param fontsDir Path where .ttf and otf font should be added
 ##
 fontsDir: "/opt/fonts"
 ## @param initialMemory
@@ -266,6 +266,7 @@ disableSecurityFilter: "false"
 ##
 resetMonitoringLogs: "false"
 ## @param allowEnvParametrization
+## ref: https://docs.geoserver.org/main/en/user/datadirectory/configtemplate.html
 ##
 allowEnvParametrization: "true"
 ## @param xframeOptions
@@ -289,7 +290,9 @@ wpsRequest: "1000/d;30s"
 ## @param userWmsRequest
 ##
 userWmsRequest: "30/s"
-
+## @param geoserverDisableStaticWebFiles
+##
+geoserverDisableStaticWebFiles: "true"
 
 ## @section GeoServer Primary parameters
 ##
