@@ -5,7 +5,7 @@ auth:
   user: "admin"
   password: "geoserver!araG1S"
 
-architecture: standalone
+architecture: replication
 
 extraEnvVars:
   - name: DB_LOWRES
@@ -17,7 +17,6 @@ extraEnvVars:
 
 initialMemory: "10G"
 maximumMemory: "20G"
-diskquotaDisabled: "true"
 stableExtensions: "css-plugin,feature-pregeneralized-plugin,web-resource-plugin"
 
 primary:
@@ -47,7 +46,6 @@ persistence:
 
 externalDatabase:
   host: "db-postgresql-primary"
-  # host: "localhost"
   user: postgres
   password: ""
   existingSecret: "db-postgresql"
