@@ -15,8 +15,8 @@ metadata:
   {{- end }}
 spec:
   scaleTargetRef:
-    apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
-    kind: Deployment
+    apiVersion: {{ template "common.capabilities.statefulset.apiVersion" . }}
+    kind: StatefulSet
     name: {{ include "geoserver.secondary.fullname" . }}
   minReplicas: {{ .Values.secondary.autoscaling.hpa.minReplicas }}
   maxReplicas: {{ .Values.secondary.autoscaling.hpa.maxReplicas }}
