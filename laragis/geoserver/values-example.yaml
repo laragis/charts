@@ -25,11 +25,11 @@ primary:
   resourcesPreset: "none"
   resources: {}
   livenessProbe:
-    enabled: false
+    enabled: true
   readinessProbe:
-    enabled: false
+    enabled: true
   startupProbe:
-    enabled: false
+    enabled: true
   service:
     type: NodePort
     nodePorts:
@@ -39,6 +39,12 @@ secondary:
   replicaCount: 1
   resourcesPreset: "none"
   resources: {}
+  livenessProbe:
+    enabled: true
+  readinessProbe:
+    enabled: true
+  startupProbe:
+    enabled: true
   service:
     type: NodePort
     nodePorts:
